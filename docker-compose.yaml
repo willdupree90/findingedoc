@@ -1,0 +1,16 @@
+services:
+  jupyter:
+    build: .
+    ports:
+      - "8888:8888"
+    env_file:
+      - .env
+    volumes:
+      - ./notebooks:/temp_project/notebooks
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]

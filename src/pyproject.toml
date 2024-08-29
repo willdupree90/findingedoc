@@ -1,0 +1,22 @@
+# pyproject.toml
+
+[project]
+name = "pyPackage"
+version = "0.0.1"
+description = "This project is a python project"
+authors = [{name = "Will Dupree", email = "willdupree90@gmail.com"}]
+dynamic = ["dependencies", "optional-dependencies"]
+
+[tool.setuptools]
+packages = ["pyPackage"]
+
+[tool.setuptools.dynamic]
+dependencies = {file = ["requirements.txt"]}
+optional-dependencies.dev = { file = ["requirements-dev.txt"] }
+
+[options]
+python_requires = ">=3.9.0"
+
+[build-system]
+requires = ["setuptools>=43.0.0", "wheel"]
+build-backend = "setuptools.build_meta"
