@@ -36,8 +36,8 @@ Set up the python code necessary to run the project.
 2. Activate and work on your environment using:
    - `workon your_env`
 
-3. To install the necessary packages, including development dependencies, run:
-   - `pip install -e .[dev]`
+3. To install the necessary packages, including development dependencies, navigate to `src` and run:
+   - `pip install -e .`
 
 ## Relevant Links and Resources
 

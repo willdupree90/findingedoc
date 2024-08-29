@@ -1,16 +1,15 @@
 services:
-  jupyter:
-    build: .
+  neo4j:
+    image: neo4j:latest
+    container_name: neo4j
     ports:
-      - "8888:8888"
-    env_file:
-      - .env
+      - "7474:7474"
+      - "7687:7687"
     volumes:
-      - ./notebooks:/temp_project/notebooks
-    deploy:
-      resources:
-        reservations:
-          devices:
-            - driver: nvidia
-              count: 1
-              capabilities: [gpu]
+      - neo4j_data:/data
+    environment:
+      - NEO4J_AUTH=${NEO4J_USERNAME}/${NEO4J_PASSWORD}
+      - NEO4JLABS_PLUGINS=["apoc"]
+
+volumes:
+  neo4j_data:

@@ -1,21 +1,20 @@
 # pyproject.toml
 
 [project]
-name = "pyPackage"
+name = "edoc"
 version = "0.0.1"
-description = "This project is a python project"
+description = "In this project, we will use generative AI, knowledge graphs, and Retrieval-Augmented Generation (RAG) to help developers explore codebases via a chatbot."
 authors = [{name = "Will Dupree", email = "willdupree90@gmail.com"}]
 dynamic = ["dependencies", "optional-dependencies"]
 
 [tool.setuptools]
-packages = ["pyPackage"]
+packages = ["edoc"]
 
 [tool.setuptools.dynamic]
 dependencies = {file = ["requirements.txt"]}
-optional-dependencies.dev = { file = ["requirements-dev.txt"] }
 
 [options]
-python_requires = ">=3.9.0"
+python_requires = ">=3.11.0"
 
 [build-system]
 requires = ["setuptools>=43.0.0", "wheel"]
