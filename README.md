@@ -1,33 +1,45 @@
-# Project
-In this project I will do the data science
+# FindingEdoc
+In this project, we will use generative AI, knowledge graphs, and Retrieval-Augmented Generation (RAG) to help developers explore codebases via a chatbot.
 
-Give relevant details and links here
+## How to Use
 
-## Docker use (preferred for GPU acceleration)
+Instructions on how to use the tool will be provided here as the project develops. Stay tuned for updates on scripts and commands that will facilitate interacting with the codebase through the chatbot.
 
-We use the GPU enabled tensorflow image to allow access to resources (required Nvidia drivers and WSL for Windows, follow [guide here](https://www.youtube.com/watch?v=YozfiLI1ogY&t=353s)). This is why we seperate Tensorflow into the `requirements-dev.txt`.
+## Environment Setup
 
-1. Install docker
+### Docker Setup
 
-2. Navigate to root of project
+We will be using Docker to manage dependencies and run services like Neo4j, which is integral to the project.
 
-3. Start service by running `docker-compose up` from command line (this could take a while depending on internet speed +1.9 GB)
+#### Steps:
 
-4. Navigate to `http://127.0.0.1:8888`, can click on link from docker logs if token is needed
+1. Install Docker if you haven't already.
 
-5. When finished run `docker-compose down`
+2. Navigate to the root of the project.
 
-## Local setup (via Python virtual environments)
+3. Start the service by running `docker-compose up` from the command line. This will set up the environment, including Neo4j.
 
-Currently use virtualenvwrapper for python
+4. Once the service is up, access the Neo4j database at [http://localhost:7474](http://localhost:7474).
 
-1. Create an environment using the terminal
-We use python 3.9
-    - `mkvirtualenv -p 3.9 your_env`
+5. When finished, stop the service by running `docker-compose down`.
 
-2. Activate and work on environment using
-    - `workon your_env`
+### Python Environment
 
-3. To install pmfraud perform from repo location
-This will ensure the development package is installed
-    - `pip install -e .[dev]`
+Set up the python code necessary to run the project.
+
+#### Steps:
+
+1. Create a virtual environment using the terminal.
+   - We use Python 3.11 for this project.
+   - `mkvirtualenv -p python3.11 your_env`
+
+2. Activate and work on your environment using:
+   - `workon your_env`
+
+3. To install the necessary packages, including development dependencies, run:
+   - `pip install -e .[dev]`
+
+## Relevant Links and Resources
+
+- [Neo4j Docker Image Documentation](https://hub.docker.com/_/neo4j)
+- [Python 3.11 Documentation](https://docs.python.org/3.11/)
