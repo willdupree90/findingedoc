@@ -22,6 +22,17 @@ from tqdm import tqdm
 from langchain.text_splitter import PythonCodeTextSplitter
 
 
+import os
+import json
+from datetime import datetime
+from neo4j import GraphDatabase
+from dotenv import load_dotenv
+from edoc.connect import connect_to_neo4j
+from tqdm import tqdm
+
+from langchain.text_splitter import PythonCodeTextSplitter
+
+
 class CodebaseGraph:
     def __init__(
             self, 
@@ -341,6 +352,22 @@ class CodebaseGraph:
         result = self.kg.query(query)
         return [record['dir_path'] for record in result]
     
+    def _find_nodes_without_embeddings(self):
+        """
+        Find all files and directories in the graph that have summaries but do not have embeddings.
+
+        Returns:
+            List[dict]: A list of dictionaries containing the node type ('File' or 'Directory') and the path.
+        """
+        query = """
+        MATCH (n)
+        WHERE n.summary IS NOT NULL AND n.summary_embedding IS NULL AND (n:File OR n:Directory)
+        RETURN labels(n) AS node_type, n.path AS node_path
+        """
+        result = self.kg.query(query)
+        return [{'node_type': record['node_type'][0], 'node_path': record['node_path']} for record in result]
+    
+    
     def _summarize_file_from_chunks(self, file_path):
         """
         Summarize a file based on the summaries of its chunks.
@@ -423,7 +450,6 @@ class CodebaseGraph:
 
         return directory_summary
 
-
     def _automate_summarization(self):
         """
         Automate the summarization process for files and directories in the graph.
@@ -438,6 +464,81 @@ class CodebaseGraph:
         for dir_path in tqdm(directories_without_summaries, 'Summarizing directories'):
             self._summarize_directory(dir_path)
 
+        # Generate embeddings for nodes that have summaries but no embeddings
+        self._generate_and_store_embeddings()
+
+    def _generate_and_store_embeddings(self):
+        """
+        Generate embeddings for files and directories that have summaries but lack embeddings.
+        """
+        nodes_without_embeddings = self._find_nodes_without_embeddings()
+
+        for node in tqdm(nodes_without_embeddings, desc='Creating File and Directory embeddings'):
+            # Retrieve the summary of the node
+            query = f"""
+            MATCH (n:{node['node_type']} {{path: $node_path}})
+            RETURN n.summary AS summary
+            """
+            result = self.kg.query(query, {'node_path': node['node_path']})
+            summary = result[0]['summary']
+
+            # Generate the embedding for the summary
+            embedding = get_embedding(summary)
+
+            # Store the embedding back in the graph
+            query = f"""
+            MATCH (n:{node['node_type']} {{path: $node_path}})
+            SET n.summary_embedding = $embedding
+            """
+            self.kg.query(query, {
+                'node_path': node['node_path'],
+                'embedding': embedding
+            })
+
+    def _create_vector_index(self, label, property_name="summary_embeddings", index_name=None, dimensions=1536):
+        """
+        Create a vector index for the specified label if it does not already exist.
+
+        Args:
+            label (str): The label of the nodes (e.g., 'File', 'Directory', 'Chunk').
+            property_name (str): The property name on which the vector index is created. Default is 'summary_embeddings'.
+            index_name (str): The name of the index. If None, it will default to 'labelVectorIndex'.
+            dimensions (int): The dimensionality of the vectors. Default is 1536.
+        """
+        if not index_name:
+            index_name = f"{label.lower()}VectorIndex"
+
+        query = f"""
+        CREATE VECTOR INDEX {index_name} IF NOT EXISTS
+        FOR (n:{label})
+        ON n.{property_name}
+        OPTIONS {{
+            indexConfig: {{
+                `vector.dimensions`: {dimensions},
+                `vector.similarity_function`: 'cosine'
+            }}
+        }}
+        """
+        try:
+            self.kg.query(query)
+            print(f"Vector index {index_name} for label {label} created successfully.")
+        except Exception as e:
+            print(f"An error occurred while creating the vector index: {e}")
+
+    def _create_all_vector_indexes(self):
+        """
+        Create vector indexes for chunks, files, and directories. The indexes are separated for chunks and summaries.
+        """
+        # Create index for chunks
+        self._create_vector_index(label="Chunk", property_name="chunk_embeddings", index_name="chunkRawVectorIndex")
+        self._create_vector_index(label="Chunk", property_name="summary_embeddings", index_name="chunkSummaryVectorIndex")
+
+        # Create index for files and directories
+        self._create_vector_index(label="File", property_name="summary_embeddings", index_name="fileSummaryVectorIndex")
+        self._create_vector_index(label="Directory", property_name="summary_embeddings", index_name="dirSummaryVectorIndex")
+
+
+
 
     def create_graph(self):
 
@@ -446,5 +547,11 @@ class CodebaseGraph:
         self._enrich_graph()
 
         self._automate_summarization()
+
+        self._generate_and_store_embeddings()
+
+        self._create_all_vector_indexes()
+
+
 
         
