@@ -214,7 +214,7 @@ class CodebaseGraph:
                 unique_classes = {}
 
                 for idx, chunk in enumerate(chunks):
-                    chunk_id = f"{file}_chunk_{idx}"
+                    chunk_id = f"{file}_chunk_{idx:06d}"
                     chunk_summary = summarize_file_chunk(chunk_text=chunk, file_name=file)
                     summary_embedding = get_embedding(chunk_summary)
                     chunk_embedding = get_embedding(chunk)
