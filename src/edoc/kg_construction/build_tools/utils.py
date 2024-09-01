@@ -123,7 +123,7 @@ def read_file_contents(file_path):
             contents = file.read()
         return contents
     except Exception as e:
-        print(f"An error occurred while reading the file: {e}")
+        print(f"An error occurred while reading the file [{file_path}]: {e}")
         return None
 
 def should_skip_file(file_path):

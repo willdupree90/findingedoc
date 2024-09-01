@@ -78,10 +78,27 @@ class SummaryManager:
         ORDER BY chunk.id ASC
         """
         result = self.kg.query(query, {'file_path': file_path})
-        chunk_summaries = ['Chunk summaries'] + [record['chunk_summary'] for record in result]
+        chunk_summaries = [record['chunk_summary'] for record in result]
 
-        # Summarize the list of chunk summaries
-        file_summary = summarize_list_of_summaries(chunk_summaries)
+        if not chunk_summaries:
+            # Fetch file metadata if no chunks are present
+            file_metadata_query = """
+            MATCH (file:File {path: $file_path})
+            RETURN file.name AS file_name, file.type AS file_type
+            """
+            metadata_result = self.kg.query(file_metadata_query, {'file_path': file_path})
+            if metadata_result:
+                metadata = metadata_result[0]
+                file_name = metadata.get('file_name', 'Unknown')
+                file_type = metadata.get('file_type', 'Unknown')
+                file_summary = f"File '{file_name}' of type '{file_type}' has no chunk summaries."
+            else:
+                file_summary = f"No chunk summaries for file {file_path}"
+        else:
+            # Summarize the list of chunk summaries
+            file_summary = summarize_list_of_summaries(
+                chunk_data={'file_path': file_path, 'chunk_summaries': chunk_summaries}
+            )
 
         # Store the file summary in the graph under the "summary" attribute
         self.kg.query("""
@@ -93,6 +110,7 @@ class SummaryManager:
         })
 
         return file_summary
+
     
     def _summarize_directory(self, directory_path):
         """
@@ -107,18 +125,20 @@ class SummaryManager:
         # Query to get summaries of all files directly contained in the directory
         file_query = """
         MATCH (dir:Directory {path: $directory_path})-[:CONTAINS]->(file:File)
-        RETURN file.summary AS file_summary
+        RETURN file.summary AS file_summary, file.name AS file_name
         """
         file_result = self.kg.query(file_query, {'directory_path': directory_path})
+        file_names = [record['file_name'] for record in file_result]
         file_summaries = [record['file_summary'] for record in file_result]
 
         # Query to get all subdirectories directly contained in the directory
         subdir_query = """
         MATCH (dir:Directory {path: $directory_path})-[:CONTAINS]->(subdir:Directory)
-        RETURN subdir.path AS subdir_path
+        RETURN subdir.path AS subdir_path, subdir.name AS subdir_name
         """
         subdir_result = self.kg.query(subdir_query, {'directory_path': directory_path})
         subdir_paths = [record['subdir_path'] for record in subdir_result]
+        subdir_names = [record['subdir_name'] for record in subdir_result]
 
         # Recursively summarize each subdirectory if it doesn't already have a summary
         subdir_summaries = []
@@ -126,11 +146,28 @@ class SummaryManager:
             subdir_summary = self._summarize_directory(subdir_path)
             subdir_summaries.append(subdir_summary)
 
-        # Combine file summaries and subdirectory summaries
-        all_summaries = ['File summaries: '] + file_summaries + ['Subdirectory summaries: ']  + subdir_summaries
+        # Prepare data for summarization
+        file_data = None
+        if file_summaries:
+            file_data = {
+                'dir_path': directory_path,
+                'file_summaries': file_summaries,
+                'file_names': file_names
+            }
+
+        subdir_data = None
+        if subdir_summaries:
+            subdir_data = {
+                'dir_path': directory_path,
+                'subdir_summaries': subdir_summaries,
+                'subdir_names': subdir_names
+            }
 
         # Summarize the list of all summaries (files + subdirectories)
-        directory_summary = summarize_list_of_summaries(all_summaries)
+        directory_summary = summarize_list_of_summaries(
+            file_data=file_data,
+            subdir_data=subdir_data
+        )
 
         # Store the directory summary in the graph under the "summary" attribute
         self.kg.query("""
@@ -142,6 +179,7 @@ class SummaryManager:
         })
 
         return directory_summary
+
 
     def _generate_and_store_embeddings(self):
         """
