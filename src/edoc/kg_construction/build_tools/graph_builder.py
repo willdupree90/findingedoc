@@ -114,7 +114,7 @@ class GraphBuilder:
                 # Create and link unique import nodes
                 for module, entities in unique_imports.items():
                     self.kg.query("""
-                        MERGE (import:Import {module: $module})
+                        MERGE (import:Import {module: $module, file_path: $file_path})
                         SET import.entities = $entities
                         WITH import
                         MATCH (file:File {path: $file_path})
@@ -128,7 +128,7 @@ class GraphBuilder:
                 # Create and link unique function nodes
                 for name, func in unique_functions.items():
                     self.kg.query("""
-                        MERGE (function:Function {name: $name})
+                        MERGE (function:Function {name: $name, file_path: $file_path})
                         SET function.parameters = $parameters, function.return_type = $return_type
                         WITH function
                         MATCH (file:File {path: $file_path})
@@ -143,7 +143,7 @@ class GraphBuilder:
                 # Create and link unique class nodes
                 for name, cls in unique_classes.items():
                     self.kg.query("""
-                        MERGE (class:Class {name: $name})
+                        MERGE (class:Class {name: $name, file_path: $file_path})
                         SET class.parameters = $parameters
                         WITH class
                         MATCH (file:File {path: $file_path})
