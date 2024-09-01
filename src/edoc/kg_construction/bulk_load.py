@@ -1,0 +1,68 @@
+import os
+from dotenv import load_dotenv
+from edoc.gpt_helpers.connect import connect_to_neo4j
+
+from edoc.kg_construction.processing_tools.file_system_processor import FileSystemProcessor
+from edoc.kg_construction.build_tools.graph_builder import GraphBuilder
+from edoc.kg_construction.summary_tools.summary_manager import SummaryManager
+
+class CodebaseGraph:
+    def __init__(
+            self, 
+            root_directory, 
+            uri="bolt://localhost:7687", 
+            user=None, 
+            password=None, 
+            openai_api_key=None,
+            chunk_size=500,
+            chunk_overlap=25
+    ):
+        """
+        Initialize the CodebaseGraph with a connection to Neo4j.
+
+        Args:
+            root_directory (str): The directory to be extracted into knowledge.
+            uri (str): The URI of the Neo4j database. Defaults to localhost.
+            user (str): Username for Neo4j. If None, loads from environment variable NEO4J_USERNAME.
+            password (str): Password for Neo4j. If None, loads from environment variable NEO4J_PASSWORD.
+            openai_api_key (str): Key needed to access OpenAI API
+            chunk_size (int): size of chunk to use (by number of tokens)
+            chunk_overlap (int): number of chunks to overlap when splitting
+        """
+        # Load environment variables
+        load_dotenv()
+
+        # Set up the Neo4j connection
+        self.uri = uri
+        self.NEO4J_USER = user or os.getenv("NEO4J_USERNAME")
+        self.NEO4J_PASSWORD =  password or os.getenv("NEO4J_PASSWORD")
+        self.OPENAI_API_KEY = openai_api_key or os.getenv("OPENAI_API_KEY")
+
+        if not self.NEO4J_USER or not self.NEO4J_PASSWORD:
+            raise ValueError("NEO4J_USERNAME and NEO4J_PASSWORD must be provided either as arguments or environment variables.")
+        
+        if not self.OPENAI_API_KEY:
+            raise ValueError("NEO4J_USERNAME and NEO4J_PASSWORD must be provided either as arguments or environment variables.")
+
+        self.kg = connect_to_neo4j()
+
+        self.chunk_size = chunk_size
+        self.chunk_overlap = chunk_overlap
+
+        self.fs_processor = FileSystemProcessor(root_directory)
+        self.graph_builder = GraphBuilder(
+            self.kg, 
+            chunk_size=self.chunk_size,
+            chunk_overlap=self.chunk_overlap
+        )
+        self.summary_manager = SummaryManager(self.kg)
+
+    def create_graph(self):
+        self.fs_processor.load_dirs_and_files_to_graph(self.kg)
+        self.graph_builder.enrich_graph()
+        self.summary_manager.automate_summarization()
+        self.graph_builder.create_all_vector_indexes()
+
+
+
+        

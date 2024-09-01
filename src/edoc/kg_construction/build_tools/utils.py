@@ -1,4 +1,5 @@
-from gptBasics import create_chat_completion
+import os
+from edoc.gpt_helpers.gpt_basics import create_chat_completion
 from pydantic import BaseModel, Field
 from typing import List, Optional
 
@@ -20,25 +21,6 @@ def summarize_file_chunk(chunk_text, file_name, model='gpt-4o-mini'):
     prompt = [
         {"role": "system", "content": "You are a helpful assistant."},
         {"role": "user", "content": f"I have this text from a file named {file_name}. The text is:\n{chunk_text}\nPlease summarize it in simple terms. Try to keep the summary brief, but maintain clarity."}
-    ]
-    return create_chat_completion(messages=prompt, model=model)
-
-def summarize_list_of_summaries(summaries, model='gpt-4o-mini'):
-    """
-    Summarize a chunk of text from a file using OpenAI's language model.
-
-    Args:
-        summaries (lst[str]): The text chunk to summarize.
-        model (str): The OpenAI model to use. Default is 'gpt-4o-mini'.
-
-    Returns:
-        str: A brief and clear summary of the chunk.
-    """
-    context = '\n'.join(summaries)
-
-    prompt = [
-        {"role": "system", "content": "You are a helpful assistant."},
-        {"role": "user", "content": f"I have these summaries {context}. \nPlease merge them into ovearching themes by summarizing them in simple terms. Try to keep the summary brief, but maintain clarity."}
     ]
     return create_chat_completion(messages=prompt, model=model)
 
@@ -143,3 +125,39 @@ def read_file_contents(file_path):
     except Exception as e:
         print(f"An error occurred while reading the file: {e}")
         return None
+
+def should_skip_file(file_path):
+    """
+    Determine if a file should be skipped based on its type or size.
+
+    Args:
+        file_path (str): The path to the file.
+
+    Returns:
+        bool: True if the file should be skipped, False otherwise.
+    """
+    # Get the file extension
+    _, ext = os.path.splitext(file_path)
+
+    # Define file types to skip
+    skip_extensions = {
+        '.lock', '.png', '.jpg', '.gif', '.pdf', '.zip', '.class', '.o', '.out',
+        '.md', '.rst', '.csv', '.tsv'
+    }
+
+    # Define directories to skip
+    skip_directories = {'node_modules', '.git', '.svn'}
+
+    # Check if the file extension is in the skip list
+    if ext.lower() in skip_extensions:
+        return True
+
+    # Check if the file is in a directory that should be skipped
+    if any(skip_dir in file_path for skip_dir in skip_directories):
+        return True
+
+    # Optionally, skip large files (e.g., > 5MB)
+    if os.path.getsize(file_path) > 5 * 1024 * 1024:
+        return True
+
+    return False
