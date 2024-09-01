@@ -1,4 +1,5 @@
 # FindingEdoc
+![Finding Edoc Banner](graph_banner.png)
 In this project, we will use generative AI, knowledge graphs, and Retrieval-Augmented Generation (RAG) to help developers explore codebases via a chatbot.
 
 ## How to Use
