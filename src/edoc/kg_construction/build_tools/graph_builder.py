@@ -1,6 +1,6 @@
 from tqdm import tqdm
 import json
-from langchain.text_splitter import PythonCodeTextSplitter
+from edoc.kg_construction.build_tools.utils import get_text_splitter
 from edoc.kg_construction.build_tools.utils import should_skip_file, read_file_contents, summarize_file_chunk, extract_code_entities
 from edoc.gpt_helpers.gpt_basics import get_embedding
 
@@ -27,7 +27,6 @@ class GraphBuilder:
         """
         Enriches the knowledge graph by processing files, creating and linking code chunks, and extracting unique code entities.
         """
-        text_splitter = PythonCodeTextSplitter(chunk_size=self.chunk_size, chunk_overlap=self.chunk_overlap)
 
         # Query to find files without chunk nodes
         query = """
@@ -45,6 +44,8 @@ class GraphBuilder:
             file_contents = read_file_contents(file)
 
             if file_contents is not None:
+                text_splitter, splitter_language = get_text_splitter(file, chunk_size=self.chunk_size, chunk_overlap=self.chunk_overlap)
+
                 chunks = text_splitter.split_text(file_contents)
 
                 # Initialize collections for unique entities
@@ -64,7 +65,8 @@ class GraphBuilder:
                         SET chunk.raw_code = $raw_code, 
                             chunk.summary = $summary, 
                             chunk.summary_embedding = $summary_embedding, 
-                            chunk.chunk_embedding = $chunk_embedding
+                            chunk.chunk_embedding = $chunk_embedding,
+                            chunk.chunk_splitter_used = $splitter_language
                         WITH chunk
                         MATCH (file:File {path: $file_path})
                         MERGE (file)-[:CONTAINS]->(chunk)
@@ -74,7 +76,8 @@ class GraphBuilder:
                         'summary': chunk_summary,
                         'summary_embedding': summary_embedding,
                         'chunk_embedding': chunk_embedding,
-                        'file_path': file
+                        'file_path': file,
+                        'splitter_language': splitter_language
                     })
 
                     # Extract and process code entities for each chunk
