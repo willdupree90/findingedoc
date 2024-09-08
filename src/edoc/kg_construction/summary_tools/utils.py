@@ -40,14 +40,50 @@ def generate_ascii_structure(root_directory, model='gpt-4o-mini'):
     
     return ascii_tree
 
-def summarize_list_of_summaries(ascii_structure_as_str, model='gpt-4o-mini', chunk_data=None, file_data=None, subdir_data=None):
+def summarize_list_of_chunks(chunk_data, model='gpt-4o-mini'):
+    """
+    Summarize a list of summaries to make global understanding.
+
+    Args:
+        model (str): The OpenAI model to use. Default is 'gpt-4o-mini'.
+        chunk_data (dict): A dictionary of name metadata and list  of chunk summaries
+
+    Returns:
+        str: A brief and clear summary of the chunk.
+    """
+
+    context = "Given context: "
+
+    file_path = chunk_data['file_path']
+    #Get nameless chunks have to add metadata
+    chunk_context = '\n'.join([f'Chunk summareis for file {file_path}: '] + [f'Chunk {i} summary: '+summary for i, summary in enumerate(chunk_data['chunk_summaries'])])
+    
+    context += '\n' + chunk_context
+
+    prompt = [
+        {"role": "system", "content": "You are a helpful assistant."},
+        {"role": "user", "content": f"""We are trying to gain understanding around a coding project. A file may have chunks (snippets of the file).
+         Can you aggregate and make summaries of a list of summaries from the given context? The goal is to build higher-level summaries of items downstream, 
+         so please try and capture themes across items.
+
+         Try to keep the summary, simple, concise, clear and structured using the following format:
+
+         ### File Summary
+        <Summarized details across chunks>
+        
+         Here is the list of chunk summaries:
+         
+         {context}"""}
+    ]
+    return create_chat_completion(messages=prompt, model=model)
+
+def summarize_list_of_files_and_subdirs(ascii_structure_as_str, model='gpt-4o-mini', file_data=None, subdir_data=None):
     """
     Summarize a list of summaries to make global understanding.
 
     Args:
         ascii_structure_as_str (str): An ASCII diagram of the project
         model (str): The OpenAI model to use. Default is 'gpt-4o-mini'.
-        chunk_data (dict): A dictionary of name metadata and list  of chunk summaries
         file_data (dict): A dictionary of name metadata and dict of [file summaries, file names]
         subdir_data (dict): A dictionary of name metadata and dict  of [subdirectory summaries, subdirectory names]
 
@@ -56,14 +92,6 @@ def summarize_list_of_summaries(ascii_structure_as_str, model='gpt-4o-mini', chu
     """
 
     context = "Given context: "
-
-    chunk_context = 'No chunk context available.'
-    if chunk_data is not None:
-        file_path = chunk_data['file_path']
-        #Get nameless chunks have to add metadata
-        chunk_context = '\n'.join([f'Chunk summareis for file {file_path}: '] + [f'Chunk {i} summary: '+summary for i, summary in enumerate(chunk_data['chunk_summaries'])])
-    
-    context += '\n' + chunk_context
 
     file_context = 'No file context available.'
     if file_data is not None:
@@ -82,17 +110,19 @@ def summarize_list_of_summaries(ascii_structure_as_str, model='gpt-4o-mini', chu
 
     prompt = [
         {"role": "system", "content": "You are a helpful assistant."},
-        {"role": "user", "content": f"""We are trying to gain understanding around a file system. It has directories, files, and chunks (snippets of the file).
-         Can you aggregate and make summaries of a list of summaries from a mix of these items? The goal is to build higher-level summaries of items downstream.
-         Try to keep the summary clear and structured, using the following format:
+        {"role": "user", "content": f"""We are trying to gain understanding around a coding project. A directory may have a mix of files or subdirectories.
+         Can you aggregate and make summaries of a list of summaries from the given context? The goal is to build higher-level summaries of items downstream, 
+         so it is important we only summarize information up to the current level (e.g., a directory summary only details contained files or subdirectories). 
+         Please try and capture themes across items.
 
-         ### File and Directory Summary
-         - **File Overview**: <Provide a general summary of file content.>
-         - **Directory Overview**: <Summarize the contents of directories and subdirectories.>
-         - **Chunk Summaries**: <List the chunk summaries found within files.>
+         Try to keep the summary, simple, concise, clear and structured using the following format:
+
+         ### Summary
+         - **File Overview**: <Provide a general summary of files contained in the focused directory.>
+         - **Subdirectory Overview**: <Summarize the contents of subdirectories contained within the directory.>
 
          
-        Ascii structure for the file system:
+        The Ascii structure can help you focus on the correct files and subdirectories:
 
         {ascii_structure_as_str} 
         

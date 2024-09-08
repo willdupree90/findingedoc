@@ -1,5 +1,5 @@
 from tqdm import tqdm
-from edoc.kg_construction.summary_tools.utils import summarize_list_of_summaries, generate_ascii_structure
+from edoc.kg_construction.summary_tools.utils import summarize_list_of_chunks, summarize_list_of_files_and_subdirs, generate_ascii_structure
 from edoc.gpt_helpers.gpt_basics import get_embedding
 
 class SummaryManager:
@@ -100,8 +100,7 @@ class SummaryManager:
                 file_summary = f"No chunk summaries for file {file_path}"
         else:
             # Summarize the list of chunk summaries
-            file_summary = summarize_list_of_summaries(
-                ascii_structure_as_str=self.ascii_str,
+            file_summary = summarize_list_of_chunks(
                 chunk_data={'file_path': file_path, 'chunk_summaries': chunk_summaries}
             )
 
@@ -169,7 +168,7 @@ class SummaryManager:
             }
 
         # Summarize the list of all summaries (files + subdirectories)
-        directory_summary = summarize_list_of_summaries(
+        directory_summary = summarize_list_of_files_and_subdirs(
             ascii_structure_as_str=self.ascii_str,
             file_data=file_data,
             subdir_data=subdir_data
