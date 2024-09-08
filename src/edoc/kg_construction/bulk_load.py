@@ -58,7 +58,7 @@ class CodebaseGraph:
             chunk_size=self.chunk_size,
             chunk_overlap=self.chunk_overlap
         )
-        self.summary_manager = SummaryManager(self.kg, root_directory)
+        self.summary_manager = SummaryManager(self.kg)
 
     def create_graph(self):
         self.fs_processor.load_dirs_and_files_to_graph(self.kg)

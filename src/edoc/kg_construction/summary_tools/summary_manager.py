@@ -6,18 +6,14 @@ class SummaryManager:
     def __init__(
             self, 
             kg,
-            root_directory
     ):
         """
         Initialize the CodebaseGraph with a connection to Neo4j.
 
         Args:
             kg (Neo4jGraph): graph object to complete cypher queries
-            root_directory (str): The directory to be extracted into knowledge.
         """
         self.kg = kg
-        print("Creating ASCII Summary")
-        self.ascii_str = generate_ascii_structure(root_directory)
 
     def _find_files_without_summaries(self):
         """
