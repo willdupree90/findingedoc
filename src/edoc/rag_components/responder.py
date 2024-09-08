@@ -47,7 +47,6 @@ class BuildResponse:
 
         prompt = ChatPromptTemplate.from_template(template)
 
-        # Define the chain with the retriever and LLM
         chain = (
             RunnableParallel(
                 {
@@ -74,7 +73,6 @@ class BuildResponse:
             str: The generated answer from the LLM.
         """
 
-        # Invoke the chain with the question and knowledge graph connection
         final_response = self.chain.invoke(
             {
                 "question": question,

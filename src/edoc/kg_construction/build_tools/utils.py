@@ -95,7 +95,6 @@ def extract_code_entities(code_string, model='gpt-4o-mini'):
     llm=ChatOpenAI(
         model_name=model
     )
-    # Modify the prompt to focus on extracting code entities
     prompt = ChatPromptTemplate.from_messages(
         [
             (
@@ -111,7 +110,6 @@ def extract_code_entities(code_string, model='gpt-4o-mini'):
         ]
     )
 
-    # Set up the chain to extract the structured output
     entity_chain = prompt | llm.with_structured_output(CodeEntities)
 
     entities = entity_chain.invoke({'code_snippet': code_string})
@@ -154,30 +152,24 @@ def should_skip_file(file_path, custom_skip_extensions=None, limit_size=True, si
     # Get the file extension
     _, ext = os.path.splitext(file_path)
 
-    # Define default file types to skip
     default_skip_extensions = {
         '.lock', '.png', '.jpg', '.gif', '.pdf', '.zip', '.class', '.o', '.out',
         '.md', '.rst', '.csv', '.tsv'
     }
 
-    # If custom extensions are provided, merge them with the default ones
     if custom_skip_extensions:
         skip_extensions = default_skip_extensions.union(set(custom_skip_extensions))
     else:
         skip_extensions = default_skip_extensions
 
-    # Define directories to skip
     skip_directories = {'node_modules', '.git', '.svn'}
 
-    # Check if the file extension is in the skip list
     if ext.lower() in skip_extensions:
         return True
 
-    # Check if the file is in a directory that should be skipped
     if any(skip_dir in file_path for skip_dir in skip_directories):
         return True
 
-    # Optionally, skip large files
     if limit_size and os.path.getsize(file_path) > size_limit_mb * 1024 * 1024:
         return True
 
@@ -196,7 +188,6 @@ def get_text_splitter(file_path, chunk_size, chunk_overlap):
         tuple: A tuple containing the RecursiveCharacterTextSplitter and a string indicating the language used.
     """
 
-    # Map file extensions to Language enums
     extension_to_language = {
         ".cpp": Language.CPP,
         ".go": Language.GO,
@@ -226,18 +217,14 @@ def get_text_splitter(file_path, chunk_size, chunk_overlap):
         
     }
 
-    # Extract the file extension
     _, extension = os.path.splitext(file_path)
 
-    # Determine the language based on the file extension
     language = extension_to_language.get(extension.lower(), Language.PYTHON)
 
-    # Return the appropriate text splitter based on the language
     splitter = RecursiveCharacterTextSplitter.from_language(
         language=language,
         chunk_size=chunk_size,
         chunk_overlap=chunk_overlap
     )
 
-    # Return the splitter and the language used
     return splitter, f"{language.name}"

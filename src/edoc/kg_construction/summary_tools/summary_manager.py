@@ -163,14 +163,12 @@ class SummaryManager:
                 'subdir_names': subdir_names
             }
 
-        # Summarize the list of all summaries (files + subdirectories)
         directory_summary = summarize_list_of_files_and_subdirs(
             ascii_structure_as_str=self.ascii_str,
             file_data=file_data,
             subdir_data=subdir_data
         )
 
-        # Store the directory summary in the graph under the "summary" attribute
         self.kg.query("""
             MATCH (dir:Directory {path: $directory_path})
             SET dir.summary = $directory_summary
@@ -197,10 +195,8 @@ class SummaryManager:
             result = self.kg.query(query, {'node_path': node['node_path']})
             summary = result[0]['summary']
 
-            # Generate the embedding for the summary
             embedding = get_embedding(summary)
 
-            # Store the embedding back in the graph
             query = f"""
             MATCH (n:{node['node_type']} {{path: $node_path}})
             SET n.summary_embedding = $embedding
@@ -224,5 +220,4 @@ class SummaryManager:
         for dir_path in tqdm(directories_without_summaries, 'Summarizing directories'):
             self._summarize_directory(dir_path)
 
-        # Generate embeddings for nodes that have summaries but no embeddings
         self._generate_and_store_embeddings()

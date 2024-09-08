@@ -42,7 +42,6 @@ def extract_code_entities(string_with_entities, model='gpt-4o-mini'):
     llm=ChatOpenAI(
         model_name=model
     )
-    # Modify the prompt to focus on extracting code entities
     prompt = ChatPromptTemplate.from_messages(
         [
             (
@@ -56,7 +55,6 @@ def extract_code_entities(string_with_entities, model='gpt-4o-mini'):
         ]
     )
 
-    # Set up the chain to extract the structured output
     entity_chain = prompt | llm.with_structured_output(ProgrammingNamedEntities)
 
     entities = entity_chain.invoke({'code_snippet': string_with_entities})

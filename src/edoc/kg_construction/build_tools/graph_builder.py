@@ -48,7 +48,6 @@ class GraphBuilder:
 
                 chunks = text_splitter.split_text(file_contents)
 
-                # Initialize collections for unique entities
                 unique_imports = {}
                 unique_functions = {}
                 unique_classes = {}
@@ -80,14 +79,12 @@ class GraphBuilder:
                         'splitter_language': splitter_language
                     })
 
-                    # Extract and process code entities for each chunk
                     try:
                         chunk_entities = extract_code_entities(chunk)
                     except Exception as e:
                         print(f"An error occurred while extracting entities (import, func, class) in a chunk for Chunk [{chunk_id}]: {e} \n Passed extracting entities")
                         continue
 
-                    # Collect unique imports
                     for imp in chunk_entities['imports']:
                         module_name = imp['module']
                         if module_name not in unique_imports:
@@ -95,7 +92,6 @@ class GraphBuilder:
                         else:
                             unique_imports[module_name].update(imp['entities'])
 
-                    # Collect unique functions
                     for func in chunk_entities['functions']:
                         func_name = func['name']
                         if func_name not in unique_functions:
@@ -104,7 +100,6 @@ class GraphBuilder:
                                 'return_type': func['return_type']
                             }
 
-                    # Collect unique classes
                     for cls in chunk_entities['classes']:
                         cls_name = cls['name']
                         if cls_name not in unique_classes:
@@ -114,7 +109,6 @@ class GraphBuilder:
 
                 # Store unique entities in the graph
 
-                # Create and link unique import nodes
                 for module, entities in unique_imports.items():
                     self.kg.query("""
                         MERGE (import:Import {module: $module, file_path: $file_path})
@@ -128,7 +122,6 @@ class GraphBuilder:
                         'file_path': file
                     })
 
-                # Create and link unique function nodes
                 for name, func in unique_functions.items():
                     self.kg.query("""
                         MERGE (function:Function {name: $name, file_path: $file_path})
@@ -143,7 +136,6 @@ class GraphBuilder:
                         'file_path': file
                     })
 
-                # Create and link unique class nodes
                 for name, cls in unique_classes.items():
                     self.kg.query("""
                         MERGE (class:Class {name: $name, file_path: $file_path})

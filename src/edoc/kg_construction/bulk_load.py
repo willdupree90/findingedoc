@@ -32,10 +32,8 @@ class CodebaseGraph:
             chunk_size (int): size of chunk to use (by number of tokens)
             chunk_overlap (int): number of chunks to overlap when splitting
         """
-        # Load environment variables
         load_dotenv()
 
-        # Set up the Neo4j connection
         self.uri = uri
         self.NEO4J_USER = user or os.getenv("NEO4J_USERNAME")
         self.NEO4J_PASSWORD =  password or os.getenv("NEO4J_PASSWORD")
@@ -72,20 +70,16 @@ def main():
     It checks for a SEED_DATA environment variable or accepts a CLI input path.
     """
 
-    # Load environment variables
     load_dotenv()
 
-    # Check for SEED_DATA environment variable
     seed_data = os.getenv('SEED_DATA')
 
-    # If SEED_DATA is not set, use argparse to get the path from CLI
     if not seed_data:
         parser = argparse.ArgumentParser(description='Seed the knowledge graph with data from a specified directory.')
         parser.add_argument('path', type=str, nargs='?', help='The path to the directory to be processed.')
         args = parser.parse_args()
         seed_data = args.path
 
-    # If no SEED_DATA is provided either by env or CLI, exit the program
     if not seed_data:
         print("Error: No seed data directory provided. Set the SEED_DATA environment variable or provide a path as a CLI argument.")
         sys.exit(1)  # Exit with a non-zero status to indicate an error
@@ -93,12 +87,10 @@ def main():
     # Convert the path to a Path object for robust handling
     seed_data = Path(seed_data).resolve()
 
-    # Check if the path exists and is a directory
     if not seed_data.is_dir():
         print(f"Error: The provided path '{seed_data}' is not a valid directory.")
         sys.exit(1)
 
-    # Initialize and run the CodebaseGraph creation
     try:
         graph = CodebaseGraph(root_directory=seed_data)
         graph.create_graph()

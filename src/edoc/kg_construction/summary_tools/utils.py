@@ -12,7 +12,6 @@ def generate_ascii_structure(root_directory, model='gpt-4o-mini'):
     Returns:
         str: The ASCII file structure summarized by the model.
     """
-    # Step 1: Create a basic tree structure using os.walk()
     root_directory = str(root_directory)
 
     file_structure = ""
@@ -29,13 +28,11 @@ def generate_ascii_structure(root_directory, model='gpt-4o-mini'):
         for f in files:
             file_structure += f"{sub_indent}{f}\n"
 
-    # Step 2: Generate the prompt for the LLM
     prompt = [
         {"role": "system", "content": "You are a helpful assistant."},
         {"role": "user", "content": f"I have the following file structure:\n{file_structure}\nPlease convert this into a clean and simple ASCII tree format. No need for any extra words, just the tree please."}
     ]
     
-    # Step 3: Use the LLM to refine the file structure into a well-formatted ASCII tree
     ascii_tree = create_chat_completion(messages=prompt, model=model)
     
     return ascii_tree

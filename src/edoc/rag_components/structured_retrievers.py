@@ -16,7 +16,6 @@ def _dir_file_structured_retriever(kg: Neo4jGraph, question: str, top_k: int) ->
     Returns:
         str: A formatted string containing the results of the neighborhood search.
     """
-    # Step 1: Perform similarity search over vector indexes for relevant chunks
     file_summary_index = create_vector_index("fileSummaryVectorIndex", "file_keyword", "File", "summary_embedding", ["name"])
     dir_summary_index = create_vector_index("dirSummaryVectorIndex", "dir_keyword", "Directory", "summary_embedding", ["name"])
 
@@ -25,20 +24,16 @@ def _dir_file_structured_retriever(kg: Neo4jGraph, question: str, top_k: int) ->
     similarity_results = perform_similarity_search(vector_indexes, question, top_k=top_k)
     files_from_similarity_search = [item.replace('\nname: ', '') for item in similarity_results]
     
-    # Step 2: Extract entities (functions, classes, imports, directories, files) from the question
     entities = extract_code_entities(question)
     entities.extend(files_from_similarity_search)
     entities = list(set(entities))
 
-    # Define an empty list to hold the final output
     final_summaries = []
     
-    # List of attributes to search by
     search_attributes = ['name', 'path']
 
     for name_or_path in entities:
         
-        # Query to handle files (finding the file and its parent directories)
         file_query_template = """
         OPTIONAL MATCH (file:File {{{attribute}: $name_or_path}})
         WITH file
@@ -47,7 +42,6 @@ def _dir_file_structured_retriever(kg: Neo4jGraph, question: str, top_k: int) ->
                collect(parent_dir.name) AS parent_dirs
         """
 
-        # Query to handle directories (find the directory and its parent directories)
         dir_query_template = """
         OPTIONAL MATCH (dir:Directory {{{attribute}: $name_or_path}})
         WITH dir
@@ -72,7 +66,6 @@ def _dir_file_structured_retriever(kg: Neo4jGraph, question: str, top_k: int) ->
                     parent_dirs = record.get("parent_dirs", [])
                     
                     if file_name is not None:
-                        # Build the file's summary context
                         summary_context = (f"File: {file_name} ({file_path})\n"
                                         f"File Summary: {file_summary}\n"
                                         f"Parent Directories: {', '.join(parent_dirs)}")
@@ -92,7 +85,6 @@ def _dir_file_structured_retriever(kg: Neo4jGraph, question: str, top_k: int) ->
                     parent_dirs = record.get("parent_dirs", [])
                     
                     if dir_name is not None:
-                        # Build the directory's summary context
                         summary_context = (f"Directory: {dir_name} ({dir_path})\n"
                                         f"Directory Summary: {dir_summary}\n"
                                         f"Parent Directories: {', '.join(parent_dirs)}")

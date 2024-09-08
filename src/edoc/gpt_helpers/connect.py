@@ -19,16 +19,13 @@ def connect_to_neo4j(uri: str = "bolt://localhost:7687") -> Neo4jGraph:
     Raises:
         ValueError: If the username or password environment variables are not set.
     """
-    # Load environment variables from a .env file
     load_dotenv()
 
-    # Retrieve username and password from environment variables
     username = os.getenv("NEO4J_USERNAME")
     password = os.getenv("NEO4J_PASSWORD")
 
     if not username or not password:
         raise ValueError("NEO4J_USERNAME and NEO4J_PASSWORD environment variables must be set.")
 
-    # Create and return the Neo4jGraph instance
     graph = Neo4jGraph(url=uri, username=username, password=password)
     return graph
