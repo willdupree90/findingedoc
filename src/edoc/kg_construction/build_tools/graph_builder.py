@@ -84,7 +84,7 @@ class GraphBuilder:
                     try:
                         chunk_entities = extract_code_entities(chunk)
                     except Exception as e:
-                        print(f"An error occurred while reading the file [{file}]: {e} \n Passed extracting entities")
+                        print(f"An error occurred while extracting entities (import, func, class) in a chunk for Chunk [{chunk_id}]: {e} \n Passed extracting entities")
                         continue
 
                     # Collect unique imports

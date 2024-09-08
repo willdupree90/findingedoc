@@ -1,20 +1,24 @@
 from tqdm import tqdm
-from edoc.kg_construction.summary_tools.utils import summarize_list_of_summaries
+from edoc.kg_construction.summary_tools.utils import summarize_list_of_summaries, generate_ascii_structure
 from edoc.gpt_helpers.gpt_basics import get_embedding
 
 class SummaryManager:
     def __init__(
             self, 
-            kg
+            kg,
+            root_directory
     ):
         """
         Initialize the CodebaseGraph with a connection to Neo4j.
 
         Args:
             kg (Neo4jGraph): graph object to complete cypher queries
+            root_directory (str): The directory to be extracted into knowledge.
         """
         self.kg = kg
-    
+        print("Creating ASCII Summary")
+        self.ascii_str = generate_ascii_structure(root_directory)
+
     def _find_files_without_summaries(self):
         """
         Find all files in the graph that do not have summaries.
@@ -97,6 +101,7 @@ class SummaryManager:
         else:
             # Summarize the list of chunk summaries
             file_summary = summarize_list_of_summaries(
+                ascii_structure_as_str=self.ascii_str,
                 chunk_data={'file_path': file_path, 'chunk_summaries': chunk_summaries}
             )
 
@@ -165,6 +170,7 @@ class SummaryManager:
 
         # Summarize the list of all summaries (files + subdirectories)
         directory_summary = summarize_list_of_summaries(
+            ascii_structure_as_str=self.ascii_str,
             file_data=file_data,
             subdir_data=subdir_data
         )

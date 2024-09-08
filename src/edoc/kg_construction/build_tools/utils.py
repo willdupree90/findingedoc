@@ -23,8 +23,17 @@ def summarize_file_chunk(chunk_text, file_name, model='gpt-4o-mini'):
     """
     prompt = [
         {"role": "system", "content": "You are a helpful assistant."},
-        {"role": "user", "content": f"I have this text from a file named {file_name}. The text is:\n{chunk_text}\nPlease summarize it in simple terms. Try to keep the summary brief, but maintain clarity."}
+        {"role": "user", "content": f"""You are helping to summarize code chunks. 
+        Please summarize the given chunk of text from the file `{file_name}`. 
+        Keep the summary brief and clear, focusing on what the code does.
+
+        The chunk codes is: {chunk_text}
+
+        Please format summaries in markdown using this tempalte:
+        **Summary**:
+        <fill in>"""}
     ]
+    
     return create_chat_completion(messages=prompt, model=model)
 
 class Parameter(BaseModel):

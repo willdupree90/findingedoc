@@ -15,7 +15,6 @@ class FileSystemProcessor:
 
         self.root_directory = root_directory
         
-
     def _get_file_info(self, file_path):
         """
         Get information about a file, including type, size, last modified date, creation date, permissions, owner, and hash.
