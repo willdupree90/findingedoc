@@ -74,11 +74,18 @@ If you specified a path for `SEED_DATA` in your `.env` file, the script will aut
 python bulk_load.py \example\path\to_directory
 ```
 
-### 3. Running the Chatbot (Future Section)
+### 3. Running the Chatbot
 
-*This section will be added in the future.*
+Once the database is populated, you can interact with the data through the chatbot interface.
 
-Once the database is populated, you'll be able to interact with the data through a chatbot interface. Instructions on setting up and running the chatbot will be provided here.
+#### Steps to run the chatbot:
+
+1. Open a terminal or command prompt.
+2. Navigate to the project directory: `findingedoc\src\edoc`.
+3. Run the following command to start the chatbot:
+   ```bash
+   python chatbot.py
+   ```
 
 ## Environment Setup
 

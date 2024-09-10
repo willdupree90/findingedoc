@@ -23,16 +23,7 @@ class BuildResponse:
         # Connect to Neo4j database
         self.kg = connect_to_neo4j()
 
-        # Initialize chain
-        self.chain = None
-
-        self.retriever_map = {
-            "summary_question" : dir_file_structured_retriever,
-            "code_question" : code_structured_retriever
-        }
-
-
-    def setup_chain(self, structured_retriever):
+    def _setup_partial_chain(self, structured_retriever):
         """
         Set up the prompt, template, and processing chain for answering questions.
 
@@ -40,12 +31,11 @@ class BuildResponse:
             structured_retriever (callable): A structured retriever to fetch context from the knowledge graph.
         """
 
-        template = """Answer the question using the following context, if you are unsure say so:
-        {context}
+        template = """Answer the question using the following context, if you are unsure say so.
 
         Question: {question}
 
-        Use natural language and be concise.
+        Context: {context}
 
         Answer:"""
 
@@ -66,25 +56,65 @@ class BuildResponse:
 
         return chain
 
-    def get_response(self, question, top_k: int = 1, next_chunk_limit: int = 1, structured_retriever_key="summary_question"):
+    #A downside to langchain again, to combine the summary code and responses
+    #We wanted to run code/summary in parallel via function call
+    # Butthe function must take the same dict, so there is no way to differ the call
+    #When running the chain. We must make two seperate functions that take same dict
+    def _get_summary_response(self, _dict):
         """
         Get the response by invoking the chain with the question and relevant context.
 
         Args:
-            question (str): The user's question.
-            top_k (int): The number of top results to consider. Default is 1.
-            structured_retriever_key (str): key that names which retriever to use.
-            next_chunk_limit (int): The number of chunks to the left/right to search in the NEXT chain
+            _dict (dict): keys include
+                question (str): The user's question.
+                top_k (int): The number of top results to consider. Default is 1.
 
         Returns:
             str: The generated answer from the LLM.
         """
 
-        retriever = self.retriever_map.get(structured_retriever_key, dir_file_structured_retriever)
+        #Could just pass the dict, but I want to be clear in setting default behavior
+        #if called standalone 
+        question = _dict.get("question") 
+        top_k = _dict.get("top_k", 1) 
 
-        self.chain = self.setup_chain(structured_retriever=retriever)
+        retriever = dir_file_structured_retriever
 
-        final_response = self.chain.invoke(
+        chain = self._setup_partial_chain(structured_retriever=retriever)
+
+        response = chain.invoke(
+            {
+                "question": question,
+                "kg": self.kg,
+                "top_k": top_k,
+            }
+        )
+        return response
+    
+    def _get_code_response(self, _dict):
+        """
+        Get the response by invoking the chain with the question and relevant context.
+
+        Args:
+            _dict (dict): keys include
+                question (str): The user's question.
+                top_k (int): The number of top results to consider. Default is 1.
+                next_chunk_limit (int): The number of chunks to the left/right to search in the NEXT chain
+
+        Returns:
+            str: The generated answer from the LLM.
+        """
+
+        #Could just pass the dict, but I want to be clear in setting default behavior
+        question = _dict.get("question") 
+        top_k = _dict.get("top_k", 1) 
+        next_chunk_limit = _dict.get("next_chunk_limit", 1) 
+
+        retriever = code_structured_retriever
+
+        chain = self._setup_partial_chain(structured_retriever=retriever)
+
+        response = chain.invoke(
             {
                 "question": question,
                 "kg": self.kg,
@@ -92,4 +122,58 @@ class BuildResponse:
                 "next_chunk_limit" : next_chunk_limit
             }
         )
-        return final_response
+        return response
+
+    def get_full_response(self,  question, top_k: int = 1, next_chunk_limit: int = 1):
+        """
+        Get the response by invoking the chain with the question and relevant context.
+
+        Args:
+            question (str): The user's question.
+            top_k (int): The number of top results to consider. Default is 1.
+            next_chunk_limit (int): The number of chunks to the left/right to search in the NEXT chain
+
+        Returns:
+            str: The generated answer from the LLM.
+        """
+
+        template = """Answer the question by combining the two parital answers you are given.
+        The two responses focus on either summary knowledge, or code specific knowledge.
+        I would like for you to combine them to a single response that answers the question
+        in detail. If there is not sufficient info say so.
+
+        Question: {question}
+
+        Summary response: {summary_response}
+
+        Code response: {code_response}
+
+        Answer:"""
+
+
+        prompt = ChatPromptTemplate.from_template(template)
+
+
+
+        chain = (
+            RunnableParallel(
+                {
+                    "summary_response": RunnablePassthrough() | self._get_summary_response,
+                    "code_response": RunnablePassthrough() | self._get_code_response,
+                    "question": RunnablePassthrough(),
+                }
+            )
+            | prompt
+            | self.llm
+            | StrOutputParser()
+        )
+
+        full_response = chain.invoke(
+            {
+                "question": question,
+                "top_k": top_k,
+                "next_chunk_limit" : next_chunk_limit
+            }
+        )
+
+        return full_response

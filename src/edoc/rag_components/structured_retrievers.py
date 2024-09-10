@@ -97,6 +97,18 @@ def _dir_file_structured_retriever(kg: Neo4jGraph, question: str, top_k: int) ->
 
 #Langchain used functions expect a single dict param, wrap the input to pass to our function
 def dir_file_structured_retriever(_dict):
+    """
+        Get the file and dir summary context
+
+        Args:
+            _dict (dict): keys include
+                kg (Neo4jGraph): The kg object to connect too.
+                question (str): The user's question.
+                top_k (int): The number of top results to consider. Default is 1.
+
+        Returns:
+            str: The generated context.
+        """
     if "top_k" not in _dict.keys():
         _dict["top_k"] = 1
     
@@ -184,6 +196,20 @@ def _code_structured_retriever(kg: Neo4jGraph, question: str, top_k: int, next_c
 
 #Langchain used functions expect a single dict param, wrap the input to pass to our function
 def code_structured_retriever(_dict):
+    """
+        Get code context by looking up chunks
+
+        Args:
+            _dict (dict): keys include
+                kg (Neo4jGraph): The kg object to connect too.
+                question (str): The user's question.
+                top_k (int): The number of top results to consider. Default is 1.
+                next_chunk_limit (int): The number of chunks to the left/right to search in the NEXT chain.
+
+        Returns:
+            str: The generated context.
+        """
+    
     if "top_k" not in _dict.keys():
         _dict["top_k"] = 1
     
