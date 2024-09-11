@@ -16,6 +16,10 @@ NEO4J_USERNAME = os.getenv('NEO4J_USERNAME')
 NEO4J_PASSWORD = os.getenv('NEO4J_PASSWORD')
 URL = "bolt://localhost:7687"
 
+from edoc.gpt_helpers.connect import OpenAiConfig
+
+OPENAI_API_KEY = OpenAiConfig.get_openai_api_key()
+
 class ProgrammingNamedEntities(BaseModel):
     """Identifying information about code entities."""
     
@@ -40,7 +44,8 @@ def extract_code_entities(string_with_entities, model='gpt-4o-mini'):
     """
 
     llm=ChatOpenAI(
-        model_name=model
+        model_name=model,
+        api_key=OPENAI_API_KEY
     )
     prompt = ChatPromptTemplate.from_messages(
         [
@@ -81,7 +86,7 @@ def create_vector_index(vector_index_name, keyword_index_name, node_label, embed
         Neo4jVector: The vector index object.
     """
     return Neo4jVector.from_existing_graph(
-        OpenAIEmbeddings(model=model),
+        OpenAIEmbeddings(model=model, api_key=OPENAI_API_KEY),
         url=URL,
         username=NEO4J_USERNAME,
         password=NEO4J_PASSWORD,

@@ -2,8 +2,9 @@ from dotenv import load_dotenv
 import os
 from openai import OpenAI
 
-load_dotenv()
-OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
+from edoc.gpt_helpers.connect import OpenAiConfig
+
+OPENAI_API_KEY = OpenAiConfig.get_openai_api_key()
 
 def create_chat_completion(messages, model='gpt-4o-mini'):
     """

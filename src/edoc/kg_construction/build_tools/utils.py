@@ -9,6 +9,10 @@ from langchain_core.prompts import ChatPromptTemplate
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.text_splitter import Language
 
+from edoc.gpt_helpers.connect import OpenAiConfig
+
+OPENAI_API_KEY = OpenAiConfig.get_openai_api_key()
+
 def summarize_file_chunk(chunk_text, file_name, model='gpt-4o-mini'):
     """
     Summarize a chunk of text from a file using OpenAI's language model.
@@ -93,7 +97,8 @@ def extract_code_entities(code_string, model='gpt-4o-mini'):
     """
 
     llm=ChatOpenAI(
-        model_name=model
+        model_name=model,
+        api_key=OPENAI_API_KEY
     )
     prompt = ChatPromptTemplate.from_messages(
         [

@@ -6,6 +6,10 @@ from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.runnables import RunnablePassthrough, RunnableParallel
 from langchain_core.output_parsers import StrOutputParser
 
+from edoc.gpt_helpers.connect import OpenAiConfig
+
+OPENAI_API_KEY = OpenAiConfig.get_openai_api_key()
+
 class BuildResponse:
     def __init__(self, model='gpt-4o-mini'):
         """
@@ -17,7 +21,8 @@ class BuildResponse:
         """
         self.llm = ChatOpenAI(
             temperature=0,
-            model=model
+            model=model,
+            api_key=OPENAI_API_KEY
         )
 
         # Connect to Neo4j database

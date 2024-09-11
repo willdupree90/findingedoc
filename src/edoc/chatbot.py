@@ -1,6 +1,11 @@
 import gradio as gr
 from edoc.rag_components.responder import BuildResponse
 
+from edoc.gpt_helpers.connect import OpenAiConfig
+
+#For the future when we change the key being used
+# OPENAI_API_KEY = OpenAiConfig.set_openai_api_key()
+
 responder = BuildResponse(model="gpt-4o-mini")
 
 def response(message, history):
