@@ -31,7 +31,7 @@ class GraphBuilder:
         # Query to find files without chunk nodes
         query = """
         MATCH (file:File)
-        WHERE NOT (file)-[:CONTAINS]->(:Chunk)
+        WHERE NOT (file)-[:CONTAINS]->()
         RETURN file.path AS file_path
         """
 
