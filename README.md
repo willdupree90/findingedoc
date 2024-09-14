@@ -3,13 +3,11 @@
 ![Finding Edoc Banner](graph_banner.png)
 In this project, we will use generative AI, knowledge graphs, and Retrieval-Augmented Generation (RAG) to help developers explore codebases via a chatbot.
 
-## Table of Contents
-
 ## How to Use
 
 ### 1. Setting Up Your Environment
 
-Before you can start  using the chatbot tool, you'll need to set up your environment. This includes obtaining necessary API keys and configuring environment variables.
+Before you can start  using the chatbot tool, you'll need to [set up your environment](#environment-setup). This includes obtaining necessary API keys and configuring environment variables.
 
 Make sure you have Docker and Python set up as per the instructions provided later in the README. This will involve:
 
@@ -40,18 +38,12 @@ Once the Docker service is up and running, launch the chatbot interface using Gr
    ```bash
    workon your_env
    ```
-
-2. Navigate to the directory containing the chatbot script:
+2. Run the chatbot interface using the following command:
    ```bash
-   cd findingedoc/src/edoc
+   python findingedoc/src/edoc/chatbot.py
    ```
 
-3. Run the chatbot interface using the following command:
-   ```bash
-   python chatbot.py
-   ```
-
-4. Once the Gradio interface starts, a link to access the chatbot interface will be displayed in your terminal. Open this link in your browser to interact with the chatbot.
+3. Once the Gradio interface starts, a link to access the chatbot interface will be displayed in your terminal. Open this link in your browser to interact with the chatbot.
 
 #### 2.3 Using the Gradio Interface
 
