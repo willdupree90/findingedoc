@@ -4,6 +4,7 @@ from dotenv import load_dotenv
 import argparse
 from pathlib import Path
 from edoc.gpt_helpers.connect import connect_to_neo4j
+from edoc.gpt_helpers.connect import OpenAiConfig
 
 from edoc.kg_construction.processing_tools.file_system_processor import FileSystemProcessor
 from edoc.kg_construction.build_tools.graph_builder import GraphBuilder
@@ -37,13 +38,13 @@ class CodebaseGraph:
         self.uri = uri
         self.NEO4J_USER = user or os.getenv("NEO4J_USERNAME")
         self.NEO4J_PASSWORD =  password or os.getenv("NEO4J_PASSWORD")
-        self.OPENAI_API_KEY = openai_api_key or os.getenv("OPENAI_API_KEY")
+        self.OPENAI_API_KEY = openai_api_key or OpenAiConfig.get_openai_api_key()
 
         if not self.NEO4J_USER or not self.NEO4J_PASSWORD:
             raise ValueError("NEO4J_USERNAME and NEO4J_PASSWORD must be provided either as arguments or environment variables.")
         
         if not self.OPENAI_API_KEY:
-            raise ValueError("NEO4J_USERNAME and NEO4J_PASSWORD must be provided either as arguments or environment variables.")
+            raise ValueError("OPENAI_API_KEY must be provided, set as param or check env file.")
 
         self.kg = connect_to_neo4j()
 
@@ -64,7 +65,7 @@ class CodebaseGraph:
         self.summary_manager.automate_summarization()
         self.graph_builder.create_all_vector_indexes()
 
-def main():
+def main(path=None):
     """
     Main function to initiate the graph creation process.
     It checks for a SEED_DATA environment variable or accepts a CLI input path.
@@ -72,7 +73,10 @@ def main():
 
     load_dotenv()
 
-    seed_data = os.getenv('SEED_DATA')
+    seed_data = path
+
+    if not seed_data:
+        seed_data = os.getenv('SEED_DATA')
 
     if not seed_data:
         parser = argparse.ArgumentParser(description='Seed the knowledge graph with data from a specified directory.')

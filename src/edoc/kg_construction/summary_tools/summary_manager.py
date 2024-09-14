@@ -164,7 +164,6 @@ class SummaryManager:
             }
 
         directory_summary = summarize_list_of_files_and_subdirs(
-            ascii_structure_as_str=self.ascii_str,
             file_data=file_data,
             subdir_data=subdir_data
         )
