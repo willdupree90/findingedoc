@@ -3,19 +3,84 @@
 ![Finding Edoc Banner](graph_banner.png)
 In this project, we will use generative AI, knowledge graphs, and Retrieval-Augmented Generation (RAG) to help developers explore codebases via a chatbot.
 
+## Table of Contents
+
 ## How to Use
 
 ### 1. Setting Up Your Environment
 
-Before you can start filling your Neo4j database or using the chatbot, you'll need to set up your environment. This includes obtaining necessary API keys and configuring environment variables.
+Before you can start  using the chatbot tool, you'll need to set up your environment. This includes obtaining necessary API keys and configuring environment variables.
 
-#### 1.1 Obtain an OpenAI API Key
+Make sure you have Docker and Python set up as per the instructions provided later in the README. This will involve:
+
+- Installing Docker and Python (if you haven't already).
+- Setting up Docker and the Python virtual environment as described in the Environment Setup section.
+
+### 2. Using Edoc for Code Question-Answer
+
+Once your environment is set up, you can start using Edoc to perform code-related questions and answers through the chatbot interface.
+
+#### 2.1 Start the Docker Service
+
+To begin, make sure that the Docker service is running. This will start the Neo4j database required for the knowledge graph.
+
+1. Open a terminal and navigate to the root directory of your project.
+2. Start the Docker service with:
+   ```bash
+   docker-compose up
+   ```
+
+This will start the necessary services for Neo4j and any other components required by the project.
+
+#### 2.2 Run the Gradio Chatbot Interface
+
+Once the Docker service is up and running, launch the chatbot interface using Gradio. This will allow you to interact with the knowledge graph and ask questions about the codebase.
+
+1. Open a terminal and activate your Python environment:
+   ```bash
+   workon your_env
+   ```
+
+2. Navigate to the directory containing the chatbot script:
+   ```bash
+   cd findingedoc/src/edoc
+   ```
+
+3. Run the chatbot interface using the following command:
+   ```bash
+   python chatbot.py
+   ```
+
+4. Once the Gradio interface starts, a link to access the chatbot interface will be displayed in your terminal. Open this link in your browser to interact with the chatbot.
+
+#### 2.3 Using the Gradio Interface
+
+The Gradio interface will provide several functionalities that allow you to upload graph data, set an API key, ask questions, and delete data from the knowledge graph.
+
+- **Set OpenAI API Key**: 
+  If you haven’t already set the `OPENAI_API_KEY` in the `.env` file, the Gradio interface will prompt you to input your OpenAI API key before interacting with the chatbot. The key will only be stored during the session.
+  
+- **Upload Graph Data**: 
+  Use the "Upload files" tab to input the path to a directory containing your codebase. The files will be processed, and the knowledge graph will be populated with the extracted information.
+
+- **Ask Questions**: 
+  Once the graph is populated with data, you can ask the chatbot questions about the codebase, such as file structure, function definitions, classes, and other key entities.
+
+- **Delete Graph Data**: 
+  If you need to delete the current knowledge graph data, navigate to the "Delete data" tab, enter the keyword `Delete`, and submit. This will clear all the nodes and relationships in the Neo4j database.
+
+
+## Environment Setup
+
+### Environment Variables
+
+#### 1. Obtain an OpenAI API Key
 
 1. Sign up for an OpenAI account if you don't have one.
 2. Visit the OpenAI API page and create an API key.
 3. Keep this key handy, as you'll need it in the next step.
 
-#### 1.2 Create an `.env` File
+#### 2. Create an `.env` File
 
 The `.env` file will store your environment variables, including credentials for Neo4j and OpenAI, as well as an optional file location for seeding the database.
 
@@ -31,63 +96,8 @@ The `.env` file will store your environment variables, including credentials for
 
 - **`NEO4J_USERNAME`**: Your Neo4j database username (we suggest leaving as `neo4j`).
 - **`NEO4J_PASSWORD`**: Your Neo4j database password.
-- **`OPENAI_API_KEY`**: The API key you obtained from OpenAI.
+- **`OPENAI_API_KEY`**: (Optional) The API key you obtained from OpenAI. If you don't include it here, you will be prompted to provide it when you launch the chatbot.
 - **`SEED_DATA`**: (Optional) Path to the directory where your data files are stored, which will be used to seed the Neo4j database.
-
-#### 1.3 Set Up the Python Environment
-
-Make sure you have Docker and Python set up as per the instructions provided earlier in the README. This will involve:
-
-- Installing Docker and Python (if you haven't already).
-- Setting up Docker and the Python virtual environment as described in the Environment Setup section.
-
-### 2. Filling the Neo4j Database
-
-Once your environment is set up, you'll need to fill your Neo4j database with data extracted from your codebase. This process involves running a bulk load script that processes your data and populates the database.
-
-#### 2.1 Run the Bulk Load Script
-Start python environment:
-```bash
-workon your_env
-```
-
-Navigate to the directory containing the bulk load script:
-
-```bash
-cd findingedoc/src/edoc/kg_construction/
-```
-
-Then, run the bulk load script from the command line:
-
-```bash
-python bulk_load.py
-```
-
-This script will:
-
-1. **Connect to Neo4j**: Using the credentials provided in your `.env` file.
-2. **Process Your Codebase**: Extract entities, summarize them, and store the information in Neo4j.
-3. **Generate Embeddings**: Create vector embeddings for the nodes in the graph, preparing them for advanced search and analysis.
-
-If you specified a path for `SEED_DATA` in your `.env` file, the script will automatically use that path. Otherwise, you should add a path like so:
-```bash
-python bulk_load.py \example\path\to_directory
-```
-
-### 3. Running the Chatbot
-
-Once the database is populated, you can interact with the data through the chatbot interface.
-
-#### Steps to run the chatbot:
-
-1. Open a terminal or command prompt.
-2. Navigate to the project directory: `findingedoc\src\edoc`.
-3. Run the following command to start the chatbot:
-   ```bash
-   python chatbot.py
-   ```
-
-## Environment Setup
 
 ### Docker Setup
 
