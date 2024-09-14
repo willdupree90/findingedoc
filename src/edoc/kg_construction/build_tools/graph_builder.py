@@ -109,7 +109,7 @@ class GraphBuilder:
 
                 # Store unique entities in the graph
 
-                for module, entities in unique_imports.items():
+                for name, entities in unique_imports.items():
                     self.kg.query("""
                         MERGE (import:Import {module: $module, file_path: $file_path})
                         SET import.entities = $entities
@@ -117,7 +117,7 @@ class GraphBuilder:
                         MATCH (file:File {path: $file_path})
                         MERGE (file)-[:CALLS]->(import)
                     """, {
-                        'module': module,
+                        'module': name,
                         'entities': list(entities),
                         'file_path': file
                     })
