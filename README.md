@@ -53,7 +53,7 @@ The Gradio interface will provide several functionalities that allow you to uplo
   If you haven’t already set the `OPENAI_API_KEY` in the `.env` file, the Gradio interface will prompt you to input your OpenAI API key before interacting with the chatbot. The key will only be stored during the session.
   
 - **Upload Graph Data**: 
-  Use the "Upload files" tab to input the path to a directory containing your codebase. The files will be processed, and the knowledge graph will be populated with the extracted information.
+  Use the "Upload files" tab to input a zip of a coding project you want to explore. The files will be processed, and the knowledge graph will be populated with the extracted information.
 
 - **Ask Questions**: 
   Once the graph is populated with data, you can ask the chatbot questions about the codebase, such as file structure, function definitions, classes, and other key entities.
