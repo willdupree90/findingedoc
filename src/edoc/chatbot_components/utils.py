@@ -52,7 +52,7 @@ def response(message, history):
 
 def get_project_root_from_temp_location(zip_file):
     # Create an upload directory inside your system
-    upload_dir = ".\\uploads"  # Local directory for testing
+    upload_dir = os.path.normpath("./uploads")  # Local directory for testing
 
     os.makedirs(upload_dir, exist_ok=True)  # Ensure the directory exists
 
@@ -62,9 +62,10 @@ def get_project_root_from_temp_location(zip_file):
     except Exception as e:
         return f"Error extracting zip file: {e}"
 
-    root_name = zip_file.name.split('\\')[-1] # get the folder name
-    root_name = root_name.split('.')[0] # Strip the '.zip'
-    extracted_project_root = os.path.join(upload_dir, root_name)  
+    # Use os.path to handle cross-platform path splitting
+    root_name = os.path.basename(zip_file.name)  # Get the file name
+    root_name = os.path.splitext(root_name)[0]   # Strip the '.zip' extension
+    extracted_project_root = os.path.join(upload_dir, root_name)
 
     if not os.path.exists(extracted_project_root):
         return None

@@ -141,7 +141,7 @@ def read_file_contents(file_path):
         print(f"An error occurred while reading the file [{file_path}]: {e}")
         return None
 
-def should_skip_file(file_path, custom_skip_extensions=None, limit_size=True, size_limit_mb=5):
+def should_skip_file_or_dir(file_path, custom_skip_extensions=None, limit_size=True, size_limit_mb=5):
     """
     Determine if a file should be skipped based on its type or size.
 
@@ -159,7 +159,7 @@ def should_skip_file(file_path, custom_skip_extensions=None, limit_size=True, si
 
     default_skip_extensions = {
         '.lock', '.png', '.jpg', '.gif', '.pdf', '.zip', '.class', '.o', '.out',
-        '.md', '.rst', '.csv', '.tsv'
+        '.md', '.rst', '.csv', '.tsv', '.pyc'
     }
 
     if custom_skip_extensions:
@@ -167,12 +167,12 @@ def should_skip_file(file_path, custom_skip_extensions=None, limit_size=True, si
     else:
         skip_extensions = default_skip_extensions
 
-    skip_directories = {'node_modules', '.git', '.svn'}
+    skip_keywords = {'node_modules', '.git', '.svn', '__pycache__', 'egg-info', '.env'}
 
     if ext.lower() in skip_extensions:
         return True
 
-    if any(skip_dir in file_path for skip_dir in skip_directories):
+    if any(keyword in file_path for keyword in skip_keywords):
         return True
 
     if limit_size and os.path.getsize(file_path) > size_limit_mb * 1024 * 1024:

@@ -27,8 +27,8 @@ class CodebaseGraph:
             user=None, 
             password=None, 
             openai_api_key=None,
-            chunk_size=500,
-            chunk_overlap=25
+            chunk_size=3500,
+            chunk_overlap=50
     ):
         """
         Initialize the CodebaseGraph with a connection to Neo4j.

@@ -1,15 +1,15 @@
 from tqdm import tqdm
 import json
 from edoc.kg_construction.build_tools.utils import get_text_splitter
-from edoc.kg_construction.build_tools.utils import should_skip_file, read_file_contents, summarize_file_chunk, extract_code_entities
+from edoc.kg_construction.build_tools.utils import should_skip_file_or_dir, read_file_contents, summarize_file_chunk, extract_code_entities
 from edoc.gpt_helpers.gpt_basics import get_embedding
 
 class GraphBuilder:
     def __init__(
             self, 
             kg,
-            chunk_size=500,
-            chunk_overlap=25
+            chunk_size=3500,
+            chunk_overlap=50
     ):
         """
         Initialize the CodebaseGraph with a connection to Neo4j.
@@ -37,8 +37,6 @@ class GraphBuilder:
 
         result = self.kg.query(query)
         file_paths = [record['file_path'] for record in result]
-
-        file_paths = [file for file in file_paths if not should_skip_file(file)]
 
         for file in tqdm(file_paths, desc='Creating chunks from files'):
             file_contents = read_file_contents(file)

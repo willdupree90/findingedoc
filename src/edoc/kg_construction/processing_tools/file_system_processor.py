@@ -1,6 +1,8 @@
 import os
 from datetime import datetime
 
+from edoc.kg_construction.build_tools.utils import should_skip_file_or_dir
+
 class FileSystemProcessor:
     def __init__(
             self, 
@@ -50,60 +52,62 @@ class FileSystemProcessor:
         for root, dirs, files in os.walk(self.root_directory):
 
             dir_name = os.path.basename(root)
-
             # Create node for the directory
-            kg.query(
-                """
-                MERGE (dir:Directory {name: $dir_name, path: $path})
-                ON CREATE SET dir.created = $created, dir.last_modified = $last_modified
-                """,
-                {
-                    'dir_name':dir_name,
-                    'path':root,
-                    'created':datetime.fromtimestamp(os.stat(root).st_ctime).isoformat(),
-                    'last_modified':datetime.fromtimestamp(os.stat(root).st_mtime).isoformat(),
-                }
-            )
+            if not should_skip_file_or_dir(root):
+                kg.query(
+                    """
+                    MERGE (dir:Directory {name: $dir_name, path: $path})
+                    ON CREATE SET dir.created = $created, dir.last_modified = $last_modified
+                    """,
+                    {
+                        'dir_name':dir_name,
+                        'path':root,
+                        'created':datetime.fromtimestamp(os.stat(root).st_ctime).isoformat(),
+                        'last_modified':datetime.fromtimestamp(os.stat(root).st_mtime).isoformat(),
+                    }
+                )
 
             # Create nodes for subdirectories
             for dir_name in dirs:
                 dir_path = os.path.join(root, dir_name)
-                kg.query(
-                    """
-                        MERGE (subdir:Directory {name: $dir_name, path: $subdir_path})
-                        ON CREATE SET subdir.created = $created, subdir.last_modified = $last_modified
-                        WITH subdir
-                        MATCH (parent:Directory {path: $parent_path})
-                        MERGE (parent)-[:CONTAINS]->(subdir)
-                    """,
-                    {
-                        'dir_name':dir_name,
-                        'subdir_path':dir_path, 
-                        'parent_path':root,
-                        'created':datetime.fromtimestamp(os.stat(dir_path).st_ctime).isoformat(),
-                        'last_modified':datetime.fromtimestamp(os.stat(dir_path).st_mtime).isoformat(),
-                    }
-                )
+                if not should_skip_file_or_dir(dir_path):
+                    kg.query(
+                        """
+                            MERGE (subdir:Directory {name: $dir_name, path: $subdir_path})
+                            ON CREATE SET subdir.created = $created, subdir.last_modified = $last_modified
+                            WITH subdir
+                            MATCH (parent:Directory {path: $parent_path})
+                            MERGE (parent)-[:CONTAINS]->(subdir)
+                        """,
+                        {
+                            'dir_name':dir_name,
+                            'subdir_path':dir_path, 
+                            'parent_path':root,
+                            'created':datetime.fromtimestamp(os.stat(dir_path).st_ctime).isoformat(),
+                            'last_modified':datetime.fromtimestamp(os.stat(dir_path).st_mtime).isoformat(),
+                        }
+                    )
 
             # Create nodes for files
             for file_name in files:
                 file_path = os.path.join(root, file_name)
                 file_info = self._get_file_info(file_path)
-                kg.query(
-                    """
-                        MERGE (file:File {name: $file_name, path: $file_path})
-                        ON CREATE SET file.type = $type, file.size = $size, file.last_modified = $last_modified, file.created = $created
-                        WITH file
-                        MATCH (parent:Directory {path: $parent_path})
-                        MERGE (parent)-[:CONTAINS]->(file)
-                    """,
-                    {
-                        'file_name':file_name, 
-                        'file_path':file_path, 
-                        'type':file_info['type'], 
-                        'size':file_info['size'], 
-                        'last_modified':file_info['last_modified'], 
-                        'created':file_info['created'], 
-                        'parent_path':root
-                    }
-                )
+                if not should_skip_file_or_dir(file_path):
+                    kg.query(
+                        """
+                            MERGE (file:File {name: $file_name, path: $file_path})
+                            ON CREATE SET file.type = $type, file.size = $size, file.last_modified = $last_modified, file.created = $created
+                            WITH file
+                            MATCH (parent:Directory {path: $parent_path})
+                            MERGE (parent)-[:CONTAINS]->(file)
+                        """,
+                        {
+                            'file_name':file_name, 
+                            'file_path':file_path, 
+                            'type':file_info['type'], 
+                            'size':file_info['size'], 
+                            'last_modified':file_info['last_modified'], 
+                            'created':file_info['created'], 
+                            'parent_path':root
+                        }
+                    )
