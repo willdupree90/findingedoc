@@ -9,43 +9,30 @@ In this project, we will use generative AI, knowledge graphs, and Retrieval-Augm
 
 Before you can start  using the chatbot tool, you'll need to [set up your environment](#environment-setup). This includes obtaining necessary API keys and configuring environment variables.
 
-Make sure you have Docker and Python set up as per the instructions provided later in the README. This will involve:
+Make sure you have Docker and Python set up as per the instructions provided later in the README (if not installed). This will involve:
 
-- Installing Docker and Python (if you haven't already).
-- Setting up Docker and the Python virtual environment as described in the Environment Setup section.
+- [Installing Docker](#docker-setup).
+- [Setting up Python](#python-environment) and virtual environments via `envwrapper`.
 
 ### 2. Using Edoc for Code Question-Answer
 
 Once your environment is set up, you can start using Edoc to perform code-related questions and answers through the chatbot interface.
 
-#### 2.1 Start the Docker Service
+#### 2.1 Run the Gradio Chatbot Interface via Docker (preferred)
 
-To begin, make sure that the Docker service is running. This will start the Neo4j database required for the knowledge graph.
+Starting the docker service brings up the chatbot, via Gradio.
 
-1. Open a terminal and navigate to the root directory of your project.
+1. Open a terminal and navigate to the root directory of the project.
+
 2. Start the Docker service with:
    ```bash
    docker-compose up
    ```
+   This will set up the environment, including Neo4j and Python Gradio App.
 
-This will start the necessary services for Neo4j and any other components required by the project.
+3. You can access the Gradio app at [http://localhost:7860](http://localhost:7860). Gradio's `share=True` so the logs may display a sharable link as well.
 
-#### 2.2 Run the Gradio Chatbot Interface
-
-Once the Docker service is up and running, launch the chatbot interface using Gradio. This will allow you to interact with the knowledge graph and ask questions about the codebase.
-
-1. Open a terminal and activate your Python environment:
-   ```bash
-   workon your_env
-   ```
-2. Run the chatbot interface using the following command:
-   ```bash
-   python findingedoc/src/edoc/chatbot.py
-   ```
-
-3. Once the Gradio interface starts, a link to access the chatbot interface will be displayed in your terminal. Open this link in your browser to interact with the chatbot.
-
-#### 2.3 Using the Gradio Interface
+#### 2.2 Using the Gradio Interface
 
 The Gradio interface will provide several functionalities that allow you to upload graph data, set an API key, ask questions, and delete data from the knowledge graph.
 
@@ -60,6 +47,30 @@ The Gradio interface will provide several functionalities that allow you to uplo
 
 - **Delete Graph Data**: 
   If you need to delete the current knowledge graph data, navigate to the "Delete data" tab, enter the keyword `Delete`, and submit. This will clear all the nodes and relationships in the Neo4j database.
+
+#### 2.3 Develop and explore locally via Neo4j Service and Python virtual environment
+
+1. From a terminal in the root of the project start the Neo4j Docker service with:
+   ```bash
+   docker-compose up neo4j
+   ```
+
+2. Open a second terminal and activate your Python environment:
+   ```bash
+   workon your_env
+   ```
+3. Run the chatbot interface using the following command:
+   ```bash
+   python findingedoc/src/edoc/chatbot.py
+   ```
+
+4. Once the Gradio interface starts, a link to access the chatbot interface will be displayed in your terminal. Open this link in your browser to interact with the chatbot.
+
+5. (Optional) Edit or execute any code via Jupyter Notebooks. Warning: if you make changes to the code base and want to re-run from Docker only again you will need to rebuild via
+   ```bash
+   docker-compose up --build
+   ```
+   This will ensure any changes to the source code are recognized within the containerized apps.
 
 
 ## Environment Setup
@@ -82,14 +93,14 @@ The `.env` file will store your environment variables, including credentials for
     ```plaintext
     NEO4J_USERNAME=your_neo4j_username
     NEO4J_PASSWORD=your_neo4j_password
+    GRADIO_SERVER_NAME="0.0.0.0"
     OPENAI_API_KEY=your_openai_api_key
-    SEED_DATA=optional_path_to_your_seed_data_directory
     ```
 
 - **`NEO4J_USERNAME`**: Your Neo4j database username (we suggest leaving as `neo4j`).
 - **`NEO4J_PASSWORD`**: Your Neo4j database password.
+- **`GRADIO_SERVER_NAME`**: Value set to access the Gradio app from our containers, [see Gradio docs](https://www.gradio.app/guides/deploying-gradio-with-docker).
 - **`OPENAI_API_KEY`**: (Optional) The API key you obtained from OpenAI. If you don't include it here, you will be prompted to provide it when you launch the chatbot.
-- **`SEED_DATA`**: (Optional) Path to the directory where your data files are stored, which will be used to seed the Neo4j database.
 
 ### Docker Setup
 
@@ -101,15 +112,17 @@ We will be using Docker to manage dependencies and run services like Neo4j, whic
 
 2. Navigate to the root of the project.
 
-3. Start the service by running `docker-compose up` from the command line. This will set up the environment, including Neo4j.
+3. Start the service by running `docker-compose up` from the command line. This will set up the environment, including Neo4j and Python Gradio App.
 
 4. Once the service is up, access the Neo4j database at [http://localhost:7474](http://localhost:7474).
 
-5. When finished, stop the service by running `docker-compose down`.
+5. You can access the Gradio app at [http://localhost:7860](http://localhost:7860)
 
-### Python Environment
+5. When finished, stop the service by running `ctr-c` and then `docker-compose down`.
 
-Set up the python code necessary to run the project.
+### Local Python Environment
+
+Set up the python code necessary to run the project on your local machine. The directions below are for `virtualenvwrapper` ([docs for Windows](https://pypi.org/project/virtualenvwrapper-win/)).
 
 #### Steps:
 

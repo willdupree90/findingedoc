@@ -79,15 +79,12 @@ class CodebaseGraph:
 def main(path=None):
     """
     Main function to initiate the graph creation process.
-    It checks for a SEED_DATA environment variable or accepts a CLI input path.
+    It checks for a provide path or a CLI input path to a directory that holds code.
     """
 
     load_dotenv()
 
     seed_data = path
-
-    if not seed_data:
-        seed_data = os.getenv('SEED_DATA')
 
     if not seed_data:
         parser = argparse.ArgumentParser(description='Seed the knowledge graph with data from a specified directory.')
@@ -96,7 +93,7 @@ def main(path=None):
         seed_data = args.path
 
     if not seed_data:
-        print("Error: No seed data directory provided. Set the SEED_DATA environment variable or provide a path as a CLI argument.")
+        print("Error: No seed data directory provided. Provide a path as a CLI argument.")
         sys.exit(1)  # Exit with a non-zero status to indicate an error
 
     # Convert the path to a Path object for robust handling
