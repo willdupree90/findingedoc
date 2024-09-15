@@ -131,3 +131,6 @@ dmypy.json
 #saved models
 saved_models/
 wandb/
+
+#uploaded temp data
+uploads/

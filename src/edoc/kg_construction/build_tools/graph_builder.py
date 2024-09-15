@@ -111,13 +111,13 @@ class GraphBuilder:
 
                 for name, entities in unique_imports.items():
                     self.kg.query("""
-                        MERGE (import:Import {module: $module, file_path: $file_path})
+                        MERGE (import:Import {name: $name, file_path: $file_path})
                         SET import.entities = $entities
                         WITH import
                         MATCH (file:File {path: $file_path})
                         MERGE (file)-[:CALLS]->(import)
                     """, {
-                        'module': name,
+                        'name': name,
                         'entities': list(entities),
                         'file_path': file
                     })

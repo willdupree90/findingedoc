@@ -36,7 +36,7 @@ class BuildResponse:
             structured_retriever (callable): A structured retriever to fetch context from the knowledge graph.
         """
 
-        template = """Answer the question using the following context, if you are unsure say so.
+        template = """Answer the question about a coding project using the following context, if you are unsure say so.
 
         Question: {question}
 
@@ -142,7 +142,7 @@ class BuildResponse:
             str: The generated answer from the LLM.
         """
 
-        template = """Answer the question by combining the two parital answers you are given.
+        template = """Answer the question about a coding project by combining the two parital answers you are given.
         The two responses focus on either summary knowledge, or code specific knowledge.
         I would like for you to combine them to a single response that answers the question
         in detail. If there is not sufficient info say so.

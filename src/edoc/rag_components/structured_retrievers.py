@@ -170,7 +170,7 @@ def _code_structured_retriever(kg: Neo4jGraph, question: str, top_k: int, next_c
     # 4. Look up imports, functions, and classes, capturing relationships
     for entity in entities:
         query = """
-        MATCH (n)
+        OPTIONAL MATCH (n)
         WHERE (n:Import OR n:Function OR n:Class) AND n.name = $entity
         OPTIONAL MATCH (n)-[r]->(related)
         OPTIONAL MATCH (related)-[r2]->(other_related)
