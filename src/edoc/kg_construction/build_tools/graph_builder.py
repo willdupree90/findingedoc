@@ -195,9 +195,9 @@ class GraphBuilder:
         Create vector indexes for chunks, files, and directories. The indexes are separated for chunks and summaries.
         """
         # Create index for chunks
-        self._create_vector_index(label="Chunk", property_name="chunk_embeddings", index_name="chunkRawVectorIndex")
-        self._create_vector_index(label="Chunk", property_name="summary_embeddings", index_name="chunkSummaryVectorIndex")
+        self._create_vector_index(label="Chunk", property_name="chunk_embedding", index_name="chunkRawVectorIndex")
+        self._create_vector_index(label="Chunk", property_name="summary_embedding", index_name="chunkSummaryVectorIndex")
 
         # Create index for files and directories
-        self._create_vector_index(label="File", property_name="summary_embeddings", index_name="fileSummaryVectorIndex")
-        self._create_vector_index(label="Directory", property_name="summary_embeddings", index_name="dirSummaryVectorIndex")
+        self._create_vector_index(label="File", property_name="summary_embedding", index_name="fileSummaryVectorIndex")
+        self._create_vector_index(label="Directory", property_name="summary_embedding", index_name="dirSummaryVectorIndex")

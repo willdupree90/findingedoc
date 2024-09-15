@@ -68,19 +68,18 @@ def extract_code_entities(string_with_entities, model='gpt-4o-mini'):
 
     return entities
 
-def create_vector_index(vector_index_name, keyword_index_name, node_label, embedding_property, text_properties, model="text-embedding-3-small", search_type="hybrid"):
+def create_vector_index(vector_index_name, node_label, embedding_property, text_properties, model="text-embedding-3-small", search_type="vector"):
     """
     Create a vector index for a given node label and embedding type.
     Quirk is text proprties are returned by string only
 
     Args:
         vector_index_name (str): The name of the vector index we would like to use.
-        keyword_index_name (str) Keyword index name to use (created if run the first time)
         node_label (str): The label of the nodes (e.g., 'Chunk', 'File', 'Directory').
         embedding_property (str): The property name for the embeddings (e.g., 'summary_embedding', 'raw_embedding').
         text_properties (list): List of text properties to include in the index (e.g., ['id', 'summary', 'raw_code']).
         model (str): The OpenAI model to use. Default is 'text-embedding-3-small'.
-        search_type (str): The type of search ('hybrid', 'exact', etc.). Default is 'hybrid'.
+        search_type (str): The type of search ('hybrid', 'vector', etc.). Default is 'vector'.
 
     Returns:
         Neo4jVector: The vector index object.
@@ -92,13 +91,12 @@ def create_vector_index(vector_index_name, keyword_index_name, node_label, embed
         password=NEO4J_PASSWORD,
         search_type=search_type,
         index_name= vector_index_name,
-        keyword_index_name=keyword_index_name,
         node_label=node_label,
         text_node_properties=text_properties,
         embedding_node_property=embedding_property
     )
 
-def perform_similarity_search(vector_indexes, question, top_k=3, additional_metadata=None):
+def perform_similarity_search(vector_indexes, question, top_k=3):
     """
     Perform a similarity search across one or more vector indexes.
 
@@ -115,5 +113,4 @@ def perform_similarity_search(vector_indexes, question, top_k=3, additional_meta
     for vector_index in vector_indexes:
         top_n_data = vector_index.similarity_search(question, k=top_k)
         results.extend(top_n_data)
-
     return [item.page_content for item in results]

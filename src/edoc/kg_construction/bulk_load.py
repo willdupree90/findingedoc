@@ -10,6 +10,15 @@ from edoc.kg_construction.processing_tools.file_system_processor import FileSyst
 from edoc.kg_construction.build_tools.graph_builder import GraphBuilder
 from edoc.kg_construction.summary_tools.summary_manager import SummaryManager
 
+from tqdm import tqdm
+import time
+
+def hacky_progress_step(title, n = 10, time_on_screen=3):
+    for i in tqdm(range(n), desc=title):
+        time.sleep(time_on_screen/n)
+
+    return
+
 class CodebaseGraph:
     def __init__(
             self, 
@@ -60,6 +69,8 @@ class CodebaseGraph:
         self.summary_manager = SummaryManager(self.kg)
 
     def create_graph(self):
+        hacky_progress_step(title="Initiating graph...", time_on_screen=1)
+        hacky_progress_step(title="Walking directory and created Directory and File nodes...")
         self.fs_processor.load_dirs_and_files_to_graph(self.kg)
         self.graph_builder.enrich_graph()
         self.summary_manager.automate_summarization()

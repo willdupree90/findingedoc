@@ -16,8 +16,19 @@ def _dir_file_structured_retriever(kg: Neo4jGraph, question: str, top_k: int) ->
     Returns:
         str: A formatted string containing the results of the neighborhood search.
     """
-    file_summary_index = create_vector_index("fileSummaryVectorIndex", "file_keyword", "File", "summary_embedding", ["name"])
-    dir_summary_index = create_vector_index("dirSummaryVectorIndex", "dir_keyword", "Directory", "summary_embedding", ["name"])
+    file_summary_index = create_vector_index(
+        vector_index_name="fileSummaryVectorIndex", 
+        node_label="File", 
+        embedding_property="summary_embedding", 
+        text_properties=["name"]
+    )
+
+    dir_summary_index = create_vector_index(
+        vector_index_name="dirSummaryVectorIndex",  
+        node_label="Directory", 
+        embedding_property="summary_embedding", 
+        text_properties=["name"]
+    )
 
     vector_indexes = [file_summary_index, dir_summary_index]
     
@@ -131,8 +142,19 @@ def _code_structured_retriever(kg: Neo4jGraph, question: str, top_k: int, next_c
         str: A formatted string containing the results of the neighborhood search.
     """
 
-    chunk_summary_index = create_vector_index("chunkSummaryVectorIndex", "code_summary_keyword", "Chunk", "summary_embedding", ["id"])
-    chunk_raw_index = create_vector_index("chunkRawVectorIndex", "code_raw_keyword", "Chunk", "chunk_embedding", ["id"])
+    chunk_summary_index = create_vector_index(
+        vector_index_name="chunkSummaryVectorIndex", 
+        node_label="Chunk", 
+        embedding_property="summary_embedding", 
+        text_properties=["id"]
+    )
+
+    chunk_raw_index = create_vector_index(
+        vector_index_name="chunkRawVectorIndex", 
+        node_label="Chunk", 
+        embedding_property="chunk_embedding", 
+        text_properties=["id"]
+    )
 
     vector_indexes = [chunk_summary_index, chunk_raw_index]
     
