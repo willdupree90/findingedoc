@@ -1,0 +1,3 @@
+FROM neo4j:latest
+
+RUN apt-get update && apt-get install -y curl

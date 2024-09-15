@@ -1,6 +1,8 @@
 services:
   neo4j:
-    image: neo4j:latest
+    build:
+      context: .
+      dockerfile: Dockerfile.neo4j
     container_name: neo4j
     ports:
       - "7474:7474"
@@ -9,7 +11,31 @@ services:
       - neo4j_data:/data
     environment:
       - NEO4J_AUTH=${NEO4J_USERNAME}/${NEO4J_PASSWORD}
-      - NEO4JLABS_PLUGINS=["apoc"]
+      - NEO4J_PLUGINS=["apoc"]
+    healthcheck:
+      test: ["CMD", "curl", "-s", "http://localhost:7474"]
+      interval: 2s
+      retries: 10
+      start_period: 15s
+      timeout: 10s
+  
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile.python
+    container_name: edoc_app
+    ports:
+      - "7860:7860"  # Gradio app port
+    environment:
+      - NEO4J_URL=bolt://neo4j:7687  # Using Neo4j service URL
+      - NEO4J_USERNAME=${NEO4J_USERNAME}
+      - NEO4J_PASSWORD=${NEO4J_PASSWORD}
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - GRADIO_SERVER_NAME=${GRADIO_SERVER_NAME}
+    depends_on:
+      neo4j:
+        condition: "service_healthy"
 
+  
 volumes:
   neo4j_data:

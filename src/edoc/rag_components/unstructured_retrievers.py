@@ -14,7 +14,7 @@ from edoc.gpt_helpers.connect import connect_to_neo4j
 load_dotenv()
 NEO4J_USERNAME = os.getenv('NEO4J_USERNAME')
 NEO4J_PASSWORD = os.getenv('NEO4J_PASSWORD')
-URL = "bolt://localhost:7687"
+URL = os.getenv("NEO4J_URL", "bolt://localhost:7687")
 
 from edoc.gpt_helpers.connect import OpenAiConfig
 

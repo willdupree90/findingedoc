@@ -4,16 +4,13 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-def connect_to_neo4j(uri: str = "bolt://localhost:7687") -> Neo4jGraph:
+def connect_to_neo4j() -> Neo4jGraph:
     """
     Connect to a Neo4j graph database.
 
     This function connects to a Neo4j graph database using the provided URI.
     By default, it connects to the local Neo4j instance at "bolt://localhost:7687".
     The function loads the username and password from environment variables using the dotenv package.
-
-    Args:
-        uri (str): The URI of the Neo4j database to connect to. Defaults to "bolt://localhost:7687".
 
     Returns:
         Neo4jGraph: An instance of the Neo4jGraph connected to the specified database.
@@ -24,6 +21,8 @@ def connect_to_neo4j(uri: str = "bolt://localhost:7687") -> Neo4jGraph:
 
     username = os.getenv("NEO4J_USERNAME")
     password = os.getenv("NEO4J_PASSWORD")
+
+    uri = os.getenv("NEO4J_URL", "bolt://localhost:7687")
 
     if not username or not password:
         raise ValueError("NEO4J_USERNAME and NEO4J_PASSWORD environment variables must be set.")
