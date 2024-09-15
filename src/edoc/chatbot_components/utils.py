@@ -52,7 +52,7 @@ def response(message, history):
 
 def get_project_root_from_temp_location(zip_file):
     # Create an upload directory inside your system
-    upload_dir = os.path.normpath("./uploads")  # Local directory for testing
+    upload_dir = os.path.normpath("../../edocSourceData")  # Local directory for testing
 
     os.makedirs(upload_dir, exist_ok=True)  # Ensure the directory exists
 

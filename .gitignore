@@ -133,4 +133,4 @@ saved_models/
 wandb/
 
 #uploaded temp data
-uploads/
+edocSourceData/
