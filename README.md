@@ -40,7 +40,7 @@ The Gradio interface will provide several functionalities that allow you to uplo
   If you haven’t already set the `OPENAI_API_KEY` in the `.env` file, the Gradio interface will prompt you to input your OpenAI API key before interacting with the chatbot. The key will only be stored during the session.
   
 - **Upload Graph Data**: 
-  Use the "Upload files" tab to input a zip of a coding project you want to explore. The files will be processed, and the knowledge graph will be populated with the extracted information.
+  Use the "Upload files" tab to input a zip of a coding project you want to explore. It is important the ZIP file contains a single root directory (top-level folder) that shares the ZIP's name. All other files, folders, and subdirectories are then placed inside that root directory.. The files will be processed, and the knowledge graph will be populated with the extracted information.
 
 - **Ask Questions**: 
   Once the graph is populated with data, you can ask the chatbot questions about the codebase, such as file structure, function definitions, classes, and other key entities.
@@ -100,7 +100,7 @@ The `.env` file will store your environment variables, including credentials for
 - **`NEO4J_USERNAME`**: Your Neo4j database username (we suggest leaving as `neo4j`).
 - **`NEO4J_PASSWORD`**: Your Neo4j database password.
 - **`GRADIO_SERVER_NAME`**: Value set to access the Gradio app from our containers, [see Gradio docs](https://www.gradio.app/guides/deploying-gradio-with-docker).
-- **`OPENAI_API_KEY`**: (Optional) The API key you obtained from OpenAI. If you don't include it here, you will be prompted to provide it when you launch the chatbot.
+- **`OPENAI_API_KEY`**: (Optional) The API key you obtained from OpenAI. If you don't include it here, you will be prompted to provide it when you launch the chatbot. The Docker app does not include the key for flexibility with users. If the key is set in `.env`, local usage should reflect this (no Gradio box to enter it).
 
 ### Docker Setup
 

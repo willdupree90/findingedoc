@@ -75,6 +75,9 @@ def get_project_root_from_temp_location(zip_file):
     
 def capture_directory_path(zip_file, progress=gr.Progress(track_tqdm=True)):
 
+    if not api_key_set:
+        return "Error: Please provide an OpenAI API key in `Manage` dropdown before using the chatbot."
+
     root_dir = get_project_root_from_temp_location(zip_file)
     if root_dir is not None:
         codebase_graph = CodebaseGraph(root_directory=root_dir)
@@ -82,7 +85,7 @@ def capture_directory_path(zip_file, progress=gr.Progress(track_tqdm=True)):
 
         return "Successfully created graph from directory."
     
-    return "Could not successfully read file from zip."
+    return "Could not successfully read file from zip. \nEnsure the ZIP file contains a single root directory (top-level folder) that shares the ZIP's name. All other files, folders, and subdirectories are then placed inside that root directory."
 
 # Function to delete graph data
 def delete_graph_data(keyword):
