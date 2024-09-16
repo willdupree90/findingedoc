@@ -93,13 +93,11 @@ The `.env` file will store your environment variables, including credentials for
     ```plaintext
     NEO4J_USERNAME=your_neo4j_username
     NEO4J_PASSWORD=your_neo4j_password
-    GRADIO_SERVER_NAME="0.0.0.0"
     OPENAI_API_KEY=your_openai_api_key
     ```
 
 - **`NEO4J_USERNAME`**: Your Neo4j database username (we suggest leaving as `neo4j`).
 - **`NEO4J_PASSWORD`**: Your Neo4j database password.
-- **`GRADIO_SERVER_NAME`**: Value set to access the Gradio app from our containers, [see Gradio docs](https://www.gradio.app/guides/deploying-gradio-with-docker).
 - **`OPENAI_API_KEY`**: (Optional) The API key you obtained from OpenAI. If you don't include it here, you will be prompted to provide it when you launch the chatbot. The Docker app does not include the key for flexibility with users. If the key is set in `.env`, local usage should reflect this (no Gradio box to enter it).
 
 ### Docker Setup
