@@ -125,6 +125,48 @@ def dir_file_structured_retriever(_dict):
     
     return _dir_file_structured_retriever(kg=_dict["kg"], question=_dict["question"], top_k=_dict["top_k"])
 
+def _get_code_entity_node_attributes(node, node_type):
+    """
+    Extract specific attributes from a node depending on its type.
+    """
+    node_data = {"name": node.get("name", "")}  # Every node should have a 'name'
+
+    if "Function" in node_type:
+        node_data["node_type"] = "Function"
+        node_data["parameters"] = node.get("parameters", "None")
+        node_data["return_type"] = node.get("return_type", "None")
+    elif "Class" in node_type:
+        node_data["node_type"] = "Class"
+        node_data["parameters"] = node.get("parameters", "None")
+    elif "Import" in node_type:
+        node_data["node_type"] = "Import"
+        node_data["entities"] = node.get("entities", "None")
+    
+    return node_data
+
+def _build_entity_context(result):
+    """
+    Build a context string for a given node, its parent file, and related nodes.
+    """
+    entity_context = ""
+
+    for record in result:
+        node = record.get("n")
+        file = record.get("file")
+        node_type =record.get("label")
+        
+        if node:
+            node_data = _get_code_entity_node_attributes(node, node_type)
+            file_name = file.get("name", "Unknown") if file else "Unknown"
+            
+            entity_context += (
+                f"File: {file_name}\n"
+                f"Entity Details: {node_data}\n"
+                f"--------------------------------------------\n"
+            )
+    
+    return entity_context
+
 def _code_structured_retriever(kg: Neo4jGraph, question: str, top_k: int, next_chunk_limit: int) -> str:
     """
     Collects the neighborhood of entities mentioned in the question by:
@@ -194,20 +236,13 @@ def _code_structured_retriever(kg: Neo4jGraph, question: str, top_k: int, next_c
         query = """
         OPTIONAL MATCH (n)
         WHERE (n:Import OR n:Function OR n:Class) AND n.name = $entity
-        OPTIONAL MATCH (n)-[r]->(related)
-        OPTIONAL MATCH (related)-[r2]->(other_related)
-        RETURN n, related, other_related
-
+        OPTIONAL MATCH (file:File)-[r]->(n)
+        RETURN n, file, labels(n) AS label
         """
         result = kg.query(query, {"entity": entity})
 
-        # Process the relationships and summarize the context
-        entity_context = ""
-        for record in result:
-            node = record.get("n")
-            related = record.get("related")
-            other_related = record.get("other_related")
-            entity_context += f"{node['name']} -> {related['name'] if related else ''} -> {other_related['name'] if other_related else ''}\n"
+        # Build the context for this entity
+        entity_context = _build_entity_context(result)
         
         final_summaries.append(entity_context)
     
