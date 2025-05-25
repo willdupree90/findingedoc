@@ -1,6 +1,10 @@
 import gradio as gr
 from edoc.gpt_helpers.connect import OpenAiConfig
-from edoc.chatbot_components.utils import response, set_openai_api_key, create_graph_from_zip, create_graph_from_git, delete_graph_data
+from edoc.chatbot_components.keys import set_openai_api_key
+from edoc.chatbot_components.responder import response
+from edoc.chatbot_components.bulk_delete import delete_graph_data
+from edoc.chatbot_components.build_graph.graph_from_git import create_graph_from_git
+from edoc.chatbot_components.build_graph.graph_from_zip import create_graph_from_zip
 
 OPENAI_API_KEY = OpenAiConfig.get_openai_api_key()
 
