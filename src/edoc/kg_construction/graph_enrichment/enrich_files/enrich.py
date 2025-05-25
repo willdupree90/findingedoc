@@ -1,10 +1,11 @@
 from tqdm import tqdm
 import json
-from edoc.kg_construction.build_tools.utils import get_text_splitter
-from edoc.kg_construction.build_tools.utils import should_skip_file_or_dir, read_file_contents, summarize_file_chunk, extract_code_entities
+from edoc.kg_construction.graph_enrichment.enrich_files.file_chunking import get_text_splitter, read_file_contents
+from edoc.kg_construction.graph_enrichment.enrich_files.summarize_chunks import summarize_file_chunk
+from edoc.kg_construction.graph_enrichment.enrich_files.entity_extraction import extract_code_entities
 from edoc.gpt_helpers.gpt_basics import get_embedding
 
-class GraphBuilder:
+class FileEnrichmentHandler:
     def __init__(
             self, 
             kg,
@@ -23,7 +24,7 @@ class GraphBuilder:
         self.chunk_size = chunk_size
         self.chunk_overlap = chunk_overlap
 
-    def enrich_graph(self):
+    def enrich_file_nodes(self):
         """
         Enriches the knowledge graph by processing files, creating and linking code chunks, and extracting unique code entities.
         """
@@ -157,45 +158,3 @@ class GraphBuilder:
                 """, {
                     'file_path': file
                 })
-
-    def _create_vector_index(self, label, property_name="summary_embeddings", index_name=None, dimensions=1536):
-        """
-        Create a vector index for the specified label if it does not already exist.
-
-        Args:
-            label (str): The label of the nodes (e.g., 'File', 'Directory', 'Chunk').
-            property_name (str): The property name on which the vector index is created. Default is 'summary_embeddings'.
-            index_name (str): The name of the index. If None, it will default to 'labelVectorIndex'.
-            dimensions (int): The dimensionality of the vectors. Default is 1536.
-        """
-        if not index_name:
-            index_name = f"{label.lower()}VectorIndex"
-
-        query = f"""
-        CREATE VECTOR INDEX {index_name} IF NOT EXISTS
-        FOR (n:{label})
-        ON n.{property_name}
-        OPTIONS {{
-            indexConfig: {{
-                `vector.dimensions`: {dimensions},
-                `vector.similarity_function`: 'cosine'
-            }}
-        }}
-        """
-        try:
-            self.kg.query(query)
-            print(f"Vector index {index_name} for label {label} created successfully.")
-        except Exception as e:
-            print(f"An error occurred while creating the vector index: {e}")
-
-    def create_all_vector_indexes(self):
-        """
-        Create vector indexes for chunks, files, and directories. The indexes are separated for chunks and summaries.
-        """
-        # Create index for chunks
-        self._create_vector_index(label="Chunk", property_name="chunk_embedding", index_name="chunkRawVectorIndex")
-        self._create_vector_index(label="Chunk", property_name="summary_embedding", index_name="chunkSummaryVectorIndex")
-
-        # Create index for files and directories
-        self._create_vector_index(label="File", property_name="summary_embedding", index_name="fileSummaryVectorIndex")
-        self._create_vector_index(label="Directory", property_name="summary_embedding", index_name="dirSummaryVectorIndex")

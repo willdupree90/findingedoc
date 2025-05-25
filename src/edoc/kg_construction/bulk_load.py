@@ -6,9 +6,12 @@ from pathlib import Path
 from edoc.gpt_helpers.connect import connect_to_neo4j
 from edoc.gpt_helpers.connect import OpenAiConfig
 
-from edoc.kg_construction.processing_tools.file_system_processor import FileSystemProcessor
-from edoc.kg_construction.build_tools.graph_builder import GraphBuilder
-from edoc.kg_construction.summary_tools.summary_manager import SummaryManager
+from edoc.kg_construction.initialize_graph.file_system_processor import CoreGraphFromDirs
+
+from edoc.kg_construction.graph_enrichment.enrich_files.enrich import FileEnrichmentHandler
+from edoc.kg_construction.graph_enrichment.initialize_embedding_index import create_all_vector_indexes
+
+from edoc.kg_construction.graph_enrichment.enrich_dirs.enrich import DirEnrichmentHandler
 
 from tqdm import tqdm
 import time
@@ -60,21 +63,22 @@ class CodebaseGraph:
         self.chunk_size = chunk_size
         self.chunk_overlap = chunk_overlap
 
-        self.fs_processor = FileSystemProcessor(root_directory)
-        self.graph_builder = GraphBuilder(
+        self.fs_processor = CoreGraphFromDirs(root_directory)
+        self.file_enrichment = FileEnrichmentHandler(
             self.kg, 
             chunk_size=self.chunk_size,
             chunk_overlap=self.chunk_overlap
         )
-        self.summary_manager = SummaryManager(self.kg)
+        self.summary_manager = DirEnrichmentHandler(self.kg)
 
     def create_graph(self):
         hacky_progress_step(title="Initiating graph...", time_on_screen=1)
         hacky_progress_step(title="Walking directory and created Directory and File nodes...")
         self.fs_processor.load_dirs_and_files_to_graph(self.kg)
-        self.graph_builder.enrich_graph()
+        self.file_enrichment.enrich_file_nodes()
         self.summary_manager.automate_summarization()
-        self.graph_builder.create_all_vector_indexes()
+        
+        create_all_vector_indexes(self.kg)
 
 def main(path=None):
     """

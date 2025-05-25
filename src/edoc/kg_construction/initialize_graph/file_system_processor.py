@@ -1,9 +1,9 @@
 import os
 from datetime import datetime
 
-from edoc.kg_construction.build_tools.utils import should_skip_file_or_dir
+from edoc.kg_construction.graph_enrichment.enrich_files.file_chunking import should_skip_file_or_dir
 
-class FileSystemProcessor:
+class CoreGraphFromDirs:
     def __init__(
             self, 
             root_directory 

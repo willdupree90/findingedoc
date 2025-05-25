@@ -1,8 +1,8 @@
 from tqdm import tqdm
-from edoc.kg_construction.summary_tools.utils import summarize_list_of_chunks, summarize_list_of_files_and_subdirs, generate_ascii_structure
+from edoc.kg_construction.graph_enrichment.enrich_dirs.summarize_lists import summarize_list_of_chunks, summarize_list_of_files_and_subdirs, generate_ascii_structure
 from edoc.gpt_helpers.gpt_basics import get_embedding
 
-class SummaryManager:
+class DirEnrichmentHandler:
     def __init__(
             self, 
             kg,
