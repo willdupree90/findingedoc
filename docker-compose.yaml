@@ -10,6 +10,7 @@ services:
     volumes:
       - neo4j_data:/data
     environment:
+      # Substituted from .env (Compose automatically picks up .env for ${…})
       - NEO4J_AUTH=${NEO4J_USERNAME}/${NEO4J_PASSWORD}
       - NEO4J_PLUGINS=["apoc"]
     healthcheck:
@@ -18,23 +19,28 @@ services:
       retries: 10
       start_period: 15s
       timeout: 10s
-  
+
   app:
     build:
       context: .
       dockerfile: Dockerfile.python
     container_name: edoc_app
     ports:
-      - "7860:7860"  # Gradio app port
+      - "7860:7860"       # Gradio app port
+    # ──────────────────────────────────────────────────────────────────────────
+    # Load all variables from your .env
+    # ──────────────────────────────────────────────────────────────────────────
+    env_file:
+      - .env
+
     environment:
-      - NEO4J_URL=bolt://neo4j:7687  # Using Neo4j service URL
-      - NEO4J_USERNAME=${NEO4J_USERNAME}
-      - NEO4J_PASSWORD=${NEO4J_PASSWORD}
+      # Always set these inside compose (they don't live in .env)
+      - NEO4J_URL=bolt://neo4j:7687
       - GRADIO_SERVER_NAME=0.0.0.0
+
     depends_on:
       neo4j:
         condition: "service_healthy"
 
-  
 volumes:
   neo4j_data:

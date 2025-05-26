@@ -1,12 +1,9 @@
 import gradio as gr
-from edoc.llm_helpers.connect import OpenAiConfig
 from edoc.chatbot_components.keys import set_openai_api_key
 from edoc.chatbot_components.responder import response
 from edoc.chatbot_components.bulk_delete import delete_graph_data
 from edoc.chatbot_components.build_graph.graph_from_git import create_graph_from_git
 from edoc.chatbot_components.build_graph.graph_from_zip import create_graph_from_zip
-
-OPENAI_API_KEY = OpenAiConfig.get_openai_api_key()
 
 with gr.Blocks(fill_height=True) as demo:
     system_prompt = gr.Markdown(
@@ -19,14 +16,6 @@ with gr.Blocks(fill_height=True) as demo:
     gr.ChatInterface(response)
 
     with gr.Accordion("Manage", open=False):
-
-        if OPENAI_API_KEY is None:
-            with gr.Tab("Set API Key"):
-                api_key_input = gr.Textbox(label="Enter your OpenAI API key (Not stored after session)", placeholder="Enter your OpenAI API key here...")
-                set_api_key_button = gr.Button("Set")
-                api_key_output = gr.Textbox(label="Status")
-
-                set_api_key_button.click(set_openai_api_key, inputs=api_key_input, outputs=api_key_output)
 
         with gr.Tab("Upload files"):
             gr.Markdown("## Choose Your Method to Upload Code Files")

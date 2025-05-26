@@ -4,7 +4,6 @@ from dotenv import load_dotenv
 import argparse
 from pathlib import Path
 from edoc.llm_helpers.connect import connect_to_neo4j
-from edoc.llm_helpers.connect import OpenAiConfig
 
 from edoc.kg_construction.initialize_graph.file_system_processor import CoreGraphFromDirs
 
@@ -50,7 +49,7 @@ class CodebaseGraph:
         self.uri = uri
         self.NEO4J_USER = user or os.getenv("NEO4J_USERNAME")
         self.NEO4J_PASSWORD =  password or os.getenv("NEO4J_PASSWORD")
-        self.OPENAI_API_KEY = openai_api_key or OpenAiConfig.get_openai_api_key()
+        self.OPENAI_API_KEY = openai_api_key or os.getenv("OPENAI_API_KEY")
 
         if not self.NEO4J_USER or not self.NEO4J_PASSWORD:
             raise ValueError("NEO4J_USERNAME and NEO4J_PASSWORD must be provided either as arguments or environment variables.")

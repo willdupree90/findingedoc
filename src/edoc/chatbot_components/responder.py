@@ -1,4 +1,3 @@
-from edoc.llm_helpers.connect import OpenAiConfig
 from edoc.rag_components.responder import BuildResponse
 
 def response(message, history):
@@ -16,16 +15,6 @@ def response(message, history):
     Returns:
         str: The chatbot's response or an error message.
     """
-    #Check if the key is in env file
-    #Force a component for setting key if not
-    api_key_set = False
-    OPENAI_API_KEY = OpenAiConfig.get_openai_api_key()
-    if OPENAI_API_KEY is not None:
-        api_key_set=True
-        
-    if not api_key_set:
-        return "Error: Please provide an OpenAI API key in `Manage` dropdown before using the chatbot."
-
     responder = BuildResponse(model="gpt-4o-mini")
 
     try:

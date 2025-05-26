@@ -1,10 +1,6 @@
 import os
 from edoc.llm_helpers.llm_client import get_llm_client
 
-llm_client = get_llm_client(
-    provider=os.getenv("OPENAI_PROVIDER", "openai")
-)
-
 def generate_ascii_structure(root_directory, model='gpt-4o-mini'):
     """
     Generates an ASCII file structure from the root directory using OpenAI's language model.
@@ -32,12 +28,17 @@ def generate_ascii_structure(root_directory, model='gpt-4o-mini'):
         for f in files:
             file_structure += f"{sub_indent}{f}\n"
 
+    llm_client = get_llm_client(
+        provider=os.getenv("OPENAI_PROVIDER", "openai"),
+        model_name=model
+    )
+
     prompt = [
         {"role": "system", "content": "You are a helpful assistant."},
         {"role": "user", "content": f"I have the following file structure:\n{file_structure}\nPlease convert this into a clean and simple ASCII tree format. No need for any extra words, just the tree please."}
     ]
     
-    ascii_tree = llm_client.chat_completion(messages=prompt, model=model)
+    ascii_tree = llm_client.chat_completion(messages=prompt)
     
     return ascii_tree
 
@@ -61,6 +62,11 @@ def summarize_list_of_chunks(chunk_data, model='gpt-4o-mini'):
     
     context += '\n' + chunk_context
 
+    llm_client = get_llm_client(
+        provider=os.getenv("OPENAI_PROVIDER", "openai"),
+        model_name=model
+    )
+
     prompt = [
         {"role": "system", "content": "You are a helpful assistant."},
         {"role": "user", "content": f"""We are trying to gain understanding around a coding project. A file may have chunks (snippets of the file).
@@ -76,7 +82,7 @@ def summarize_list_of_chunks(chunk_data, model='gpt-4o-mini'):
          
          {context}"""}
     ]
-    return llm_client.chat_completion(messages=prompt, model=model)
+    return llm_client.chat_completion(messages=prompt)
 
 def summarize_list_of_files_and_subdirs(model='gpt-4o-mini', file_data=None, subdir_data=None):
     """
@@ -108,6 +114,11 @@ def summarize_list_of_files_and_subdirs(model='gpt-4o-mini', file_data=None, sub
 
     context += '\n' + subdir_context
 
+    llm_client = get_llm_client(
+        provider=os.getenv("OPENAI_PROVIDER", "openai"),
+        model_name=model
+    )
+
     prompt = [
         {"role": "system", "content": "You are a helpful assistant."},
         {"role": "user", "content": f"""We are trying to gain understanding around a coding project. A directory may have a mix of files or subdirectories.
@@ -125,4 +136,4 @@ def summarize_list_of_files_and_subdirs(model='gpt-4o-mini', file_data=None, sub
          
          {context}"""}
     ]
-    return llm_client.chat_completion(messages=prompt, model=model)
+    return llm_client.chat_completion(messages=prompt)

@@ -1,6 +1,5 @@
 import os
 import gradio as gr
-from edoc.llm_helpers.connect import OpenAiConfig
 
 from git import Repo, GitCommandError
 
@@ -71,15 +70,6 @@ def create_graph_from_git(git_url, git_token=None, use_branch=None, progress=gr.
     Returns:
         str: Success message or an error message.
     """
-    #Check if the key is in env file
-    #Force a component for setting key if not
-    api_key_set = False
-    OPENAI_API_KEY = OpenAiConfig.get_openai_api_key()
-    if OPENAI_API_KEY is not None:
-        api_key_set=True
-    if not api_key_set:
-        return "Error: Please provide an OpenAI API key in `Manage` dropdown before using the chatbot."
-
     root_dir = get_project_root_from_github(git_url, git_token, use_branch)
     if root_dir is not None:
         codebase_graph = CodebaseGraph(root_directory=root_dir)

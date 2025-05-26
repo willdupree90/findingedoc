@@ -6,7 +6,7 @@ from openai import OpenAI
 from openai import AzureOpenAI
 
 # LangChain SDK
-from langchain.chat_models import ChatOpenAI, AzureChatOpenAI
+from langchain_openai import ChatOpenAI, AzureChatOpenAI
 
 
 class BaseLLM(ABC):

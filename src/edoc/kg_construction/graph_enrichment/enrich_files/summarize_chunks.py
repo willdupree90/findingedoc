@@ -14,7 +14,8 @@ def summarize_file_chunk(chunk_text, file_name, model='gpt-4o-mini'):
         str: A brief and clear summary of the chunk.
     """
     llm_client = get_llm_client(
-        provider=os.getenv("OPENAI_PROVIDER", "openai")
+        provider=os.getenv("OPENAI_PROVIDER", "openai"),
+        model_name=model
     )
 
     prompt = [
@@ -30,4 +31,4 @@ def summarize_file_chunk(chunk_text, file_name, model='gpt-4o-mini'):
         <fill in>"""}
     ]
     
-    return llm_client.chat_completion(messages=prompt, model=model)
+    return llm_client.chat_completion(messages=prompt)

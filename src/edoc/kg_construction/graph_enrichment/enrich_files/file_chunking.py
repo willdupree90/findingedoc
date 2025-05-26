@@ -3,10 +3,6 @@ import os
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.text_splitter import Language
 
-from edoc.llm_helpers.connect import OpenAiConfig
-
-OPENAI_API_KEY = OpenAiConfig.get_openai_api_key()
-
 def read_file_contents(file_path):
     """
     Opens a file and reads its contents as text.

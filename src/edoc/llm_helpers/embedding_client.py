@@ -6,7 +6,7 @@ from openai import OpenAI
 from openai import AzureOpenAI
 
 # LangChain Embeddings SDK
-from langchain.embeddings import OpenAIEmbeddings
+from langchain_openai import OpenAIEmbeddings
 from langchain_openai import AzureOpenAIEmbeddings
 
 

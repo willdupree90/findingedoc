@@ -2,10 +2,6 @@ from dotenv import load_dotenv
 import os
 from openai import OpenAI
 
-from edoc.llm_helpers.connect import OpenAiConfig
-
-OPENAI_API_KEY = OpenAiConfig.get_openai_api_key()
-
 def create_chat_completion(messages, model='gpt-4o-mini'):
     """
     Create a chat completion using the OpenAI API.
@@ -17,7 +13,7 @@ def create_chat_completion(messages, model='gpt-4o-mini'):
     Returns:
         str: The content of the response from the OpenAI API.
     """
-    client = OpenAI(api_key=OPENAI_API_KEY)
+    client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
     response = client.chat.completions.create(messages=messages, model=model)
     return response.choices[0].message.content
 
@@ -32,6 +28,6 @@ def get_embedding(text, model="text-embedding-3-small"):
     Returns:
         list: A list of floats representing the embedding vector of the input text.
     """
-    client = OpenAI(api_key=OPENAI_API_KEY)
+    client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
     text = text.replace("\n", " ")
     return client.embeddings.create(input=[text], model=model).data[0].embedding
