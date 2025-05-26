@@ -1,6 +1,6 @@
 import openai
-from edoc.gpt_helpers.connect import OpenAiConfig
-from edoc.gpt_helpers.gpt_basics import get_embedding
+from edoc.llm_helpers.connect import OpenAiConfig
+from edoc.llm_helpers.gpt_basics import get_embedding
 
 def set_openai_api_key(api_key):
     """

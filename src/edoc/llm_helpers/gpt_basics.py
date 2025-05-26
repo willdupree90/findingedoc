@@ -2,7 +2,7 @@ from dotenv import load_dotenv
 import os
 from openai import OpenAI
 
-from edoc.gpt_helpers.connect import OpenAiConfig
+from edoc.llm_helpers.connect import OpenAiConfig
 
 OPENAI_API_KEY = OpenAiConfig.get_openai_api_key()
 

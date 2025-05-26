@@ -1,5 +1,5 @@
 import gradio as gr
-from edoc.gpt_helpers.connect import OpenAiConfig
+from edoc.llm_helpers.connect import OpenAiConfig
 from edoc.chatbot_components.keys import set_openai_api_key
 from edoc.chatbot_components.responder import response
 from edoc.chatbot_components.bulk_delete import delete_graph_data

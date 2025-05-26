@@ -4,7 +4,7 @@ from typing import List, Optional
 from langchain_openai import ChatOpenAI
 from langchain_core.prompts import ChatPromptTemplate
 
-from edoc.gpt_helpers.connect import OpenAiConfig
+from edoc.llm_helpers.connect import OpenAiConfig
 OPENAI_API_KEY = OpenAiConfig.get_openai_api_key()
 
 class Parameter(BaseModel):

@@ -1,6 +1,6 @@
 import os
 import gradio as gr
-from edoc.gpt_helpers.connect import OpenAiConfig
+from edoc.llm_helpers.connect import OpenAiConfig
 
 from git import Repo, GitCommandError
 

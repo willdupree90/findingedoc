@@ -3,8 +3,8 @@ import sys
 from dotenv import load_dotenv
 import argparse
 from pathlib import Path
-from edoc.gpt_helpers.connect import connect_to_neo4j
-from edoc.gpt_helpers.connect import OpenAiConfig
+from edoc.llm_helpers.connect import connect_to_neo4j
+from edoc.llm_helpers.connect import OpenAiConfig
 
 from edoc.kg_construction.initialize_graph.file_system_processor import CoreGraphFromDirs
 

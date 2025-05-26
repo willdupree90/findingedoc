@@ -1,4 +1,4 @@
-from edoc.gpt_helpers.gpt_basics import create_chat_completion
+from edoc.llm_helpers.gpt_basics import create_chat_completion
 
 def summarize_file_chunk(chunk_text, file_name, model='gpt-4o-mini'):
     """

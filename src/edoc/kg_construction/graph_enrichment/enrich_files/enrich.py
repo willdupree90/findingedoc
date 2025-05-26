@@ -3,7 +3,7 @@ import json
 from edoc.kg_construction.graph_enrichment.enrich_files.file_chunking import get_text_splitter, read_file_contents
 from edoc.kg_construction.graph_enrichment.enrich_files.summarize_chunks import summarize_file_chunk
 from edoc.kg_construction.graph_enrichment.enrich_files.entity_extraction import extract_code_entities
-from edoc.gpt_helpers.gpt_basics import get_embedding
+from edoc.llm_helpers.gpt_basics import get_embedding
 
 class FileEnrichmentHandler:
     def __init__(

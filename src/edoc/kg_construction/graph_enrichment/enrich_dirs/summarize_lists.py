@@ -1,5 +1,5 @@
 import os
-from edoc.gpt_helpers.gpt_basics import create_chat_completion
+from edoc.llm_helpers.gpt_basics import create_chat_completion
 
 def generate_ascii_structure(root_directory, model='gpt-4o-mini'):
     """

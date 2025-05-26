@@ -1,4 +1,4 @@
-from edoc.gpt_helpers.connect import connect_to_neo4j
+from edoc.llm_helpers.connect import connect_to_neo4j
 from edoc.rag_components.structured_retrievers import dir_file_structured_retriever, code_structured_retriever
 
 from langchain_openai import ChatOpenAI
@@ -6,7 +6,7 @@ from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.runnables import RunnablePassthrough, RunnableParallel
 from langchain_core.output_parsers import StrOutputParser
 
-from edoc.gpt_helpers.connect import OpenAiConfig
+from edoc.llm_helpers.connect import OpenAiConfig
 
 OPENAI_API_KEY = OpenAiConfig.get_openai_api_key()
 

@@ -1,4 +1,4 @@
-from edoc.gpt_helpers.connect import connect_to_neo4j
+from edoc.llm_helpers.connect import connect_to_neo4j
 # Function to delete graph data
 
 def delete_graph_data(keyword):

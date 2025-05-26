@@ -1,4 +1,4 @@
-from edoc.gpt_helpers.connect import OpenAiConfig
+from edoc.llm_helpers.connect import OpenAiConfig
 from edoc.rag_components.responder import BuildResponse
 
 def response(message, history):

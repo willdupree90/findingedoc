@@ -2,7 +2,7 @@ import gradio as gr
 import os
 import zipfile
 
-from edoc.gpt_helpers.connect import OpenAiConfig
+from edoc.llm_helpers.connect import OpenAiConfig
 
 from edoc.kg_construction.bulk_load import CodebaseGraph
 
