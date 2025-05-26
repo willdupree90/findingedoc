@@ -30,7 +30,8 @@ class CodebaseGraph:
             password=None, 
             openai_api_key=None,
             chunk_size=3500,
-            chunk_overlap=50
+            chunk_overlap=50,
+            model='gpt-4o-mini'
     ):
         """
         Initialize the CodebaseGraph with a connection to Neo4j.
@@ -43,6 +44,7 @@ class CodebaseGraph:
             openai_api_key (str): Key needed to access OpenAI API
             chunk_size (int): size of chunk to use (by number of tokens)
             chunk_overlap (int): number of chunks to overlap when splitting
+            model (str): The OpenAI model to use. Default is 'gpt-4o-mini'.
         """
         load_dotenv()
 
@@ -61,14 +63,19 @@ class CodebaseGraph:
 
         self.chunk_size = chunk_size
         self.chunk_overlap = chunk_overlap
+        self.model = model
 
         self.fs_processor = CoreGraphFromDirs(root_directory)
         self.file_enrichment = FileEnrichmentHandler(
             self.kg, 
             chunk_size=self.chunk_size,
-            chunk_overlap=self.chunk_overlap
+            chunk_overlap=self.chunk_overlap,
+            model=self.model
         )
-        self.summary_manager = DirEnrichmentHandler(self.kg)
+        self.summary_manager = DirEnrichmentHandler(
+            self.kg,
+            model=self.model
+        )
 
     def create_graph(self):
         hacky_progress_step(title="Initiating graph...", time_on_screen=1)
@@ -79,7 +86,7 @@ class CodebaseGraph:
         
         create_all_vector_indexes(self.kg)
 
-def main(path=None):
+def main(path=None, model='gpt-4o-mini'):
     """
     Main function to initiate the graph creation process.
     It checks for a provide path or a CLI input path to a directory that holds code.
@@ -107,7 +114,10 @@ def main(path=None):
         sys.exit(1)
 
     try:
-        graph = CodebaseGraph(root_directory=seed_data)
+        graph = CodebaseGraph(
+            root_directory=seed_data,
+            model=model
+        )
         graph.create_graph()
         print(f"Graph successfully created from directory: {seed_data}")
     except Exception as e:

@@ -1,20 +1,23 @@
 import os
 from tqdm import tqdm
-from edoc.kg_construction.graph_enrichment.enrich_dirs.summarize_lists import summarize_list_of_chunks, summarize_list_of_files_and_subdirs, generate_ascii_structure
+from edoc.kg_construction.graph_enrichment.enrich_dirs.summarize_lists import summarize_list_of_chunks, summarize_list_of_files_and_subdirs
 from edoc.llm_helpers.embedding_client import get_embedding_client
 
 class DirEnrichmentHandler:
     def __init__(
             self, 
             kg,
+            model='gpt-4o-mini'
     ):
         """
         Initialize the CodebaseGraph with a connection to Neo4j.
 
         Args:
             kg (Neo4jGraph): graph object to complete cypher queries
+            model (str): The OpenAI model to use. Default is 'gpt-4o-mini'.
         """
         self.kg = kg
+        self.model = model
         self.embedding_client = get_embedding_client(
             provider=os.getenv("OPENAI_PROVIDER", "openai"),
         )
@@ -101,7 +104,8 @@ class DirEnrichmentHandler:
         else:
             # Summarize the list of chunk summaries
             file_summary = summarize_list_of_chunks(
-                chunk_data={'file_path': file_path, 'chunk_summaries': chunk_summaries}
+                chunk_data={'file_path': file_path, 'chunk_summaries': chunk_summaries},
+                model=self.model
             )
 
         # Store the file summary in the graph under the "summary" attribute
@@ -169,7 +173,8 @@ class DirEnrichmentHandler:
 
         directory_summary = summarize_list_of_files_and_subdirs(
             file_data=file_data,
-            subdir_data=subdir_data
+            subdir_data=subdir_data,
+            model=self.model
         )
 
         self.kg.query("""

@@ -11,7 +11,8 @@ class FileEnrichmentHandler:
             self, 
             kg,
             chunk_size=3500,
-            chunk_overlap=50
+            chunk_overlap=50,
+            model='gpt-4o-mini'
     ):
         """
         Initialize the CodebaseGraph with a connection to Neo4j.
@@ -20,10 +21,12 @@ class FileEnrichmentHandler:
             kg (Neo4jGraph): graph object to complete cypher queries
             chunk_size (int): size of chunk to use (by number of tokens)
             chunk_overlap (int): number of chunks to overlap when splitting
+            model (str): The OpenAI model to use. Default is 'gpt-4o-mini'.
         """
         self.kg = kg
         self.chunk_size = chunk_size
         self.chunk_overlap = chunk_overlap
+        self.model = model
         self.embedding_client = get_embedding_client(
             provider=os.getenv("OPENAI_PROVIDER", "openai"),
         )
@@ -57,7 +60,7 @@ class FileEnrichmentHandler:
 
                 for idx, chunk in enumerate(chunks):
                     chunk_id = f"{file}_chunk_{idx:06d}"
-                    chunk_summary = summarize_file_chunk(chunk_text=chunk, file_name=file)
+                    chunk_summary = summarize_file_chunk(chunk_text=chunk, file_name=file, model=self.model)
                     summary_embedding = self.embedding_client.embed(chunk_summary)
                     chunk_embedding = self.embedding_client.embed(chunk)
 
@@ -83,7 +86,7 @@ class FileEnrichmentHandler:
                     })
 
                     try:
-                        chunk_entities = extract_code_entities(chunk)
+                        chunk_entities = extract_code_entities(chunk, model=self.model)
                     except Exception as e:
                         print(f"An error occurred while extracting entities (import, func, class) in a chunk for Chunk [{chunk_id}]: {e} \n Passed extracting entities")
                         continue
