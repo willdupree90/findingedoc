@@ -1,5 +1,9 @@
 import os
-from edoc.llm_helpers.gpt_basics import create_chat_completion
+from edoc.llm_helpers.llm_client import get_llm_client
+
+llm_client = get_llm_client(
+    provider=os.getenv("OPENAI_PROVIDER", "openai")
+)
 
 def generate_ascii_structure(root_directory, model='gpt-4o-mini'):
     """
@@ -33,7 +37,7 @@ def generate_ascii_structure(root_directory, model='gpt-4o-mini'):
         {"role": "user", "content": f"I have the following file structure:\n{file_structure}\nPlease convert this into a clean and simple ASCII tree format. No need for any extra words, just the tree please."}
     ]
     
-    ascii_tree = create_chat_completion(messages=prompt, model=model)
+    ascii_tree = llm_client.chat_completion(messages=prompt, model=model)
     
     return ascii_tree
 
@@ -72,7 +76,7 @@ def summarize_list_of_chunks(chunk_data, model='gpt-4o-mini'):
          
          {context}"""}
     ]
-    return create_chat_completion(messages=prompt, model=model)
+    return llm_client.chat_completion(messages=prompt, model=model)
 
 def summarize_list_of_files_and_subdirs(model='gpt-4o-mini', file_data=None, subdir_data=None):
     """
@@ -121,4 +125,4 @@ def summarize_list_of_files_and_subdirs(model='gpt-4o-mini', file_data=None, sub
          
          {context}"""}
     ]
-    return create_chat_completion(messages=prompt, model=model)
+    return llm_client.chat_completion(messages=prompt, model=model)

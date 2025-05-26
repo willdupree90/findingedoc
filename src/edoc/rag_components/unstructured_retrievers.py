@@ -1,10 +1,11 @@
 import os
+from edoc.llm_helpers.llm_client import get_llm_client
+from edoc.llm_helpers.embedding_client import get_embedding_client
 from dotenv import load_dotenv
 
 from pydantic import BaseModel, Field
 from typing import List
 
-from langchain_openai import ChatOpenAI
 from langchain_core.prompts import ChatPromptTemplate
 
 from langchain_community.vectorstores import Neo4jVector
@@ -15,10 +16,6 @@ load_dotenv()
 NEO4J_USERNAME = os.getenv('NEO4J_USERNAME')
 NEO4J_PASSWORD = os.getenv('NEO4J_PASSWORD')
 URL = os.getenv("NEO4J_URL", "bolt://localhost:7687")
-
-from edoc.llm_helpers.connect import OpenAiConfig
-
-OPENAI_API_KEY = OpenAiConfig.get_openai_api_key()
 
 class ProgrammingNamedEntities(BaseModel):
     """Identifying information about code entities."""
@@ -42,11 +39,11 @@ def extract_code_entities(string_with_entities, model='gpt-4o-mini'):
     Returns:
         entities: An instance of ProgrammingNamedEntities containing the extracted directories, files, imports, functions, and classes.
     """
-
-    llm=ChatOpenAI(
-        model_name=model,
-        api_key=OPENAI_API_KEY
+    llm_client = get_llm_client(
+        provider=os.getenv("LANGCHAIN_PROVIDER", "langchain"),
+        model_name=model
     )
+    llm = llm_client.llm
     prompt = ChatPromptTemplate.from_messages(
         [
             (
@@ -84,8 +81,12 @@ def create_vector_index(vector_index_name, node_label, embedding_property, text_
     Returns:
         Neo4jVector: The vector index object.
     """
+    embedding_client = get_embedding_client(
+            provider=os.getenv("LANGCHAIN_PROVIDER", "langchain"),
+        )
+
     return Neo4jVector.from_existing_graph(
-        OpenAIEmbeddings(model=model, api_key=OPENAI_API_KEY),
+        embedding_client.embeddings,
         url=URL,
         username=NEO4J_USERNAME,
         password=NEO4J_PASSWORD,

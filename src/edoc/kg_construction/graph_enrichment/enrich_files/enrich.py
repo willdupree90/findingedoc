@@ -1,9 +1,10 @@
 from tqdm import tqdm
 import json
+import os
 from edoc.kg_construction.graph_enrichment.enrich_files.file_chunking import get_text_splitter, read_file_contents
 from edoc.kg_construction.graph_enrichment.enrich_files.summarize_chunks import summarize_file_chunk
 from edoc.kg_construction.graph_enrichment.enrich_files.entity_extraction import extract_code_entities
-from edoc.llm_helpers.gpt_basics import get_embedding
+from edoc.llm_helpers.embedding_client import get_embedding_client
 
 class FileEnrichmentHandler:
     def __init__(
@@ -23,6 +24,9 @@ class FileEnrichmentHandler:
         self.kg = kg
         self.chunk_size = chunk_size
         self.chunk_overlap = chunk_overlap
+        self.embedding_client = get_embedding_client(
+            provider=os.getenv("OPENAI_PROVIDER", "openai"),
+        )
 
     def enrich_file_nodes(self):
         """
@@ -54,8 +58,8 @@ class FileEnrichmentHandler:
                 for idx, chunk in enumerate(chunks):
                     chunk_id = f"{file}_chunk_{idx:06d}"
                     chunk_summary = summarize_file_chunk(chunk_text=chunk, file_name=file)
-                    summary_embedding = get_embedding(chunk_summary)
-                    chunk_embedding = get_embedding(chunk)
+                    summary_embedding = self.embedding_client.embed(chunk_summary)
+                    chunk_embedding = self.embedding_client.embed(chunk)
 
                     # Create the chunk node and link it to the file
                     self.kg.query("""

@@ -1,14 +1,12 @@
+import os
+from edoc.llm_helpers.llm_client import get_llm_client
+
 from edoc.llm_helpers.connect import connect_to_neo4j
 from edoc.rag_components.structured_retrievers import dir_file_structured_retriever, code_structured_retriever
 
-from langchain_openai import ChatOpenAI
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.runnables import RunnablePassthrough, RunnableParallel
 from langchain_core.output_parsers import StrOutputParser
-
-from edoc.llm_helpers.connect import OpenAiConfig
-
-OPENAI_API_KEY = OpenAiConfig.get_openai_api_key()
 
 class BuildResponse:
     def __init__(self, model='gpt-4o-mini'):
@@ -19,11 +17,11 @@ class BuildResponse:
             llm_model (str): The language model to use. Default is 'gpt-4o-mini'.
 
         """
-        self.llm = ChatOpenAI(
-            temperature=0,
-            model=model,
-            api_key=OPENAI_API_KEY
+        llm_client = get_llm_client(
+            provider=os.getenv("LANGCHAIN_PROVIDER", "langchain"),
+            model_name=model
         )
+        self.llm = llm_client.llm
 
         # Connect to Neo4j database
         self.kg = connect_to_neo4j()

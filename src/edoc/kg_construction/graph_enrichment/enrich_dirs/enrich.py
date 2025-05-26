@@ -1,6 +1,7 @@
+import os
 from tqdm import tqdm
 from edoc.kg_construction.graph_enrichment.enrich_dirs.summarize_lists import summarize_list_of_chunks, summarize_list_of_files_and_subdirs, generate_ascii_structure
-from edoc.llm_helpers.gpt_basics import get_embedding
+from edoc.llm_helpers.embedding_client import get_embedding_client
 
 class DirEnrichmentHandler:
     def __init__(
@@ -14,6 +15,9 @@ class DirEnrichmentHandler:
             kg (Neo4jGraph): graph object to complete cypher queries
         """
         self.kg = kg
+        self.embedding_client = get_embedding_client(
+            provider=os.getenv("OPENAI_PROVIDER", "openai"),
+        )
 
     def _find_files_without_summaries(self):
         """
@@ -194,7 +198,7 @@ class DirEnrichmentHandler:
             result = self.kg.query(query, {'node_path': node['node_path']})
             summary = result[0]['summary']
 
-            embedding = get_embedding(summary)
+            embedding = self.embedding_client.embed(summary)
 
             query = f"""
             MATCH (n:{node['node_type']} {{path: $node_path}})

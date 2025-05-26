@@ -85,20 +85,37 @@ The Gradio interface will provide several functionalities that allow you to uplo
 
 #### 2. Create an `.env` File
 
-The `.env` file will store your environment variables, including credentials for Neo4j and OpenAI, as well as an optional file location for seeding the database.
+In the root of your project, create a file named `.env` and add **all** of the following variables:
 
-1. In the root directory of your project, create a file named `.env`.
-2. Add the following environment variables to your `.env` file:
+```dotenv
+# ──────────────────────────────────────────────────────────────────────────────
+# Neo4j credentials
+# ──────────────────────────────────────────────────────────────────────────────
+NEO4J_USERNAME=your_neo4j_username      # e.g. “neo4j”
+NEO4J_PASSWORD=your_neo4j_password
 
-    ```plaintext
-    NEO4J_USERNAME=your_neo4j_username
-    NEO4J_PASSWORD=your_neo4j_password
-    OPENAI_API_KEY=your_openai_api_key
-    ```
+# ──────────────────────────────────────────────────────────────────────────────
+# OpenAI vs. Azure provider selection
+# ──────────────────────────────────────────────────────────────────────────────
+OPENAI_PROVIDER=openai            # “openai” for public, “azure” for Azure OpenAI
+LANGCHAIN_PROVIDER=langchain      # “langchain” for public, “azure-langchain” for Azure via LangChain
 
-- **`NEO4J_USERNAME`**: Your Neo4j database username (we suggest leaving as `neo4j`).
-- **`NEO4J_PASSWORD`**: Your Neo4j database password.
-- **`OPENAI_API_KEY`**: (Optional) The API key you obtained from OpenAI. If you don't include it here, you will be prompted to provide it when you launch the chatbot. The Docker app does not include the key for flexibility with users. If the key is set in `.env`, local usage should reflect this (no Gradio box to enter it).
+# ──────────────────────────────────────────────────────────────────────────────
+# API Keys & Endpoints
+# ──────────────────────────────────────────────────────────────────────────────
+OPENAI_API_KEY=your_openai_api_key
+
+# (Only required if OPENAI_PROVIDER=azure or LANGCHAIN_PROVIDER=azure-langchain)
+AZURE_OPENAI_KEY=your_azure_api_key
+AZURE_OPENAI_ENDPOINT=https://<your-azure-endpoint>.openai.azure.com/
+AZURE_OPENAI_API_VERSION=2023-06-01-preview
+
+# ──────────────────────────────────────────────────────────────────────────────
+# Model names
+# ──────────────────────────────────────────────────────────────────────────────
+LLM_MODEL=gpt-4o-mini             # Chat‐completion model identifier
+EMBEDDING_MODEL=text-embedding-3-small  # Embedding model identifier
+```
 
 ### Docker Setup
 

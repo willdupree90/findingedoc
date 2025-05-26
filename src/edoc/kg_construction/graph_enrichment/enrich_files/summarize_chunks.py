@@ -1,4 +1,5 @@
-from edoc.llm_helpers.gpt_basics import create_chat_completion
+import os
+from edoc.llm_helpers.llm_client import get_llm_client
 
 def summarize_file_chunk(chunk_text, file_name, model='gpt-4o-mini'):
     """
@@ -12,6 +13,10 @@ def summarize_file_chunk(chunk_text, file_name, model='gpt-4o-mini'):
     Returns:
         str: A brief and clear summary of the chunk.
     """
+    llm_client = get_llm_client(
+        provider=os.getenv("OPENAI_PROVIDER", "openai")
+    )
+
     prompt = [
         {"role": "system", "content": "You are a helpful assistant."},
         {"role": "user", "content": f"""You are helping to summarize code chunks. 
@@ -25,4 +30,4 @@ def summarize_file_chunk(chunk_text, file_name, model='gpt-4o-mini'):
         <fill in>"""}
     ]
     
-    return create_chat_completion(messages=prompt, model=model)
+    return llm_client.chat_completion(messages=prompt, model=model)

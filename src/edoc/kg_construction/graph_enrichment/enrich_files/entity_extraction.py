@@ -1,11 +1,11 @@
+import os
+
 from pydantic import BaseModel, Field
 from typing import List, Optional
 
-from langchain_openai import ChatOpenAI
 from langchain_core.prompts import ChatPromptTemplate
 
-from edoc.llm_helpers.connect import OpenAiConfig
-OPENAI_API_KEY = OpenAiConfig.get_openai_api_key()
+from edoc.llm_helpers.llm_client import get_llm_client
 
 class Parameter(BaseModel):
     """Model representing a function or class parameter."""
@@ -63,10 +63,12 @@ def extract_code_entities(code_string, model='gpt-4o-mini'):
         entities: An instance of CodeEntities containing the extracted imports, functions, and classes.
     """
 
-    llm=ChatOpenAI(
-        model_name=model,
-        api_key=OPENAI_API_KEY
+    llm_client = get_llm_client(
+        provider=os.getenv("LANGCHAIN_PROVIDER", "langchain"),
+        model_name=model
     )
+    llm = llm_client.llm
+
     prompt = ChatPromptTemplate.from_messages(
         [
             (
