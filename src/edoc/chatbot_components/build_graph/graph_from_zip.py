@@ -39,7 +39,7 @@ def get_project_root_from_temp_location(zip_file):
     
     return extracted_project_root
     
-def create_graph_from_zip(zip_file, progress=gr.Progress(track_tqdm=True)):
+def create_graph_from_zip(zip_file, model, progress=gr.Progress(track_tqdm=True)):
     """
     Create a knowledge graph from a ZIP file.
 
@@ -48,6 +48,7 @@ def create_graph_from_zip(zip_file, progress=gr.Progress(track_tqdm=True)):
 
     Args:
         zip_file (file): The ZIP file containing the codebase.
+        model (str): The LLM model to use. Defaults from env, see llm_client.py
         progress (gr.Progress, optional): Gradio's progress tracker.
 
     Returns:
@@ -55,7 +56,7 @@ def create_graph_from_zip(zip_file, progress=gr.Progress(track_tqdm=True)):
     """
     root_dir = get_project_root_from_temp_location(zip_file)
     if root_dir is not None:
-        codebase_graph = CodebaseGraph(root_directory=root_dir)
+        codebase_graph = CodebaseGraph(root_directory=root_dir, model=model)
         codebase_graph.create_graph()
 
         return "Successfully created graph from directory."

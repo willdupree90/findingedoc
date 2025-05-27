@@ -31,7 +31,7 @@ class CodebaseGraph:
             openai_api_key=None,
             chunk_size=3500,
             chunk_overlap=50,
-            model='gpt-4o-mini'
+            model=None
     ):
         """
         Initialize the CodebaseGraph with a connection to Neo4j.
@@ -63,7 +63,7 @@ class CodebaseGraph:
 
         self.chunk_size = chunk_size
         self.chunk_overlap = chunk_overlap
-        self.model = model
+        self.model = model or os.getenv("LLM_MODEL", "gpt-4o-mini")
 
         self.fs_processor = CoreGraphFromDirs(root_directory)
         self.file_enrichment = FileEnrichmentHandler(
@@ -86,7 +86,7 @@ class CodebaseGraph:
         
         create_all_vector_indexes(self.kg)
 
-def main(path=None, model='gpt-4o-mini'):
+def main(path=None):
     """
     Main function to initiate the graph creation process.
     It checks for a provide path or a CLI input path to a directory that holds code.
@@ -115,8 +115,7 @@ def main(path=None, model='gpt-4o-mini'):
 
     try:
         graph = CodebaseGraph(
-            root_directory=seed_data,
-            model=model
+            root_directory=seed_data
         )
         graph.create_graph()
         print(f"Graph successfully created from directory: {seed_data}")

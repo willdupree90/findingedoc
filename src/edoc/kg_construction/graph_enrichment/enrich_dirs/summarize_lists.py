@@ -1,13 +1,13 @@
 import os
 from edoc.llm_helpers.llm_client import get_llm_client
 
-def generate_ascii_structure(root_directory, model='gpt-4o-mini'):
+def generate_ascii_structure(root_directory, model=None):
     """
     Generates an ASCII file structure from the root directory using OpenAI's language model.
 
     Args:
         root_directory (str): The root directory to summarize.
-        model (str): The OpenAI model to use. Default is 'gpt-4o-mini'.
+        model (str): The OpenAI model to use. Default is 'gpt-4o-mini'. See `llm_client.py`.
 
     Returns:
         str: The ASCII file structure summarized by the model.
@@ -42,12 +42,12 @@ def generate_ascii_structure(root_directory, model='gpt-4o-mini'):
     
     return ascii_tree
 
-def summarize_list_of_chunks(chunk_data, model='gpt-4o-mini'):
+def summarize_list_of_chunks(chunk_data, model=None):
     """
     Summarize a list of summaries to make global understanding.
 
     Args:
-        model (str): The OpenAI model to use. Default is 'gpt-4o-mini'.
+        model (str): The OpenAI model to use. Default is 'gpt-4o-mini'. See `llm_client.py`.
         chunk_data (dict): A dictionary of name metadata and list  of chunk summaries
 
     Returns:
@@ -84,12 +84,12 @@ def summarize_list_of_chunks(chunk_data, model='gpt-4o-mini'):
     ]
     return llm_client.chat_completion(messages=prompt)
 
-def summarize_list_of_files_and_subdirs(model='gpt-4o-mini', file_data=None, subdir_data=None):
+def summarize_list_of_files_and_subdirs(model=None, file_data=None, subdir_data=None):
     """
     Summarize a list of summaries to make global understanding.
 
     Args:
-        model (str): The OpenAI model to use. Default is 'gpt-4o-mini'.
+        model (str): The OpenAI model to use. Default is 'gpt-4o-mini'. See `llm_client.py`.
         file_data (dict): A dictionary of name metadata and dict of [file summaries, file names]
         subdir_data (dict): A dictionary of name metadata and dict  of [subdirectory summaries, subdirectory names]
 

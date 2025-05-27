@@ -7,14 +7,14 @@ class DirEnrichmentHandler:
     def __init__(
             self, 
             kg,
-            model='gpt-4o-mini'
+            model=None
     ):
         """
         Initialize the CodebaseGraph with a connection to Neo4j.
 
         Args:
             kg (Neo4jGraph): graph object to complete cypher queries
-            model (str): The OpenAI model to use. Default is 'gpt-4o-mini'.
+            model (str): The OpenAI model to use. Default is 'gpt-4o-mini'. See `llm_client.py`.
         """
         self.kg = kg
         self.model = model

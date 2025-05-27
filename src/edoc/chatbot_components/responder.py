@@ -1,6 +1,6 @@
 from edoc.rag_components.responder import BuildResponse
 
-def response(message, history):
+def response(message, history, model):
     """
     Generate a chatbot response based on user input and chat history.
 
@@ -15,7 +15,7 @@ def response(message, history):
     Returns:
         str: The chatbot's response or an error message.
     """
-    responder = BuildResponse(model="gpt-4o-mini")
+    responder = BuildResponse(model=model)
 
     try:
         response = responder.get_full_response(

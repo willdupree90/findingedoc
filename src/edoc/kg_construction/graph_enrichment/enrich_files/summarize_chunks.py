@@ -1,14 +1,14 @@
 import os
 from edoc.llm_helpers.llm_client import get_llm_client
 
-def summarize_file_chunk(chunk_text, file_name, model='gpt-4o-mini'):
+def summarize_file_chunk(chunk_text, file_name, model=None):
     """
     Summarize a chunk of text from a file using OpenAI's language model.
 
     Args:
         chunk_text (str): The text chunk to summarize.
         file_name (str): The name of the file from which the chunk was extracted.
-        model (str): The OpenAI model to use. Default is 'gpt-4o-mini'.
+        model (str): The OpenAI model to use. Default is 'gpt-4o-mini'. See `llm_client.py`.
 
     Returns:
         str: A brief and clear summary of the chunk.

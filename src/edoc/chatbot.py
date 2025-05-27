@@ -1,8 +1,27 @@
+import os
 import gradio as gr
+from dotenv import load_dotenv
 from edoc.chatbot_components.responder import response
 from edoc.chatbot_components.bulk_delete import delete_graph_data
 from edoc.chatbot_components.build_graph.graph_from_git import create_graph_from_git
 from edoc.chatbot_components.build_graph.graph_from_zip import create_graph_from_zip
+
+load_dotenv()
+
+default_model_selection = os.getenv("LLM_MODEL", 'gpt-4o-mini')
+
+MODEL_CHOICES = [
+    'gpt-4.1-nano',
+    'gpt-4o',
+    'gpt-4.1-mini',
+    'gpt-4o-mini',
+    'o3-mini',
+    'o4-mini'
+]
+
+if default_model_selection not in MODEL_CHOICES:
+    MODEL_CHOICES.append(default_model_selection)
+
 
 with gr.Blocks(fill_height=True) as demo:
     system_prompt = gr.Markdown(
@@ -12,7 +31,16 @@ with gr.Blocks(fill_height=True) as demo:
         """
     )
 
-    gr.ChatInterface(response)
+    gr.ChatInterface(
+        response,
+        additional_inputs=[
+            gr.Dropdown(
+                choices=MODEL_CHOICES,
+                value=default_model_selection,
+                label="Chat Model"
+            )
+        ]
+    )
 
     with gr.Accordion("Manage", open=False):
 
@@ -21,10 +49,16 @@ with gr.Blocks(fill_height=True) as demo:
 
             upload_output = gr.Textbox(label="Graph Progress")
 
+            graph_build_model = gr.Dropdown(
+                choices=MODEL_CHOICES,
+                value=default_model_selection,
+                label="Graph Creation Model"
+            )
+
             with gr.Group():
                 gr.Markdown("### Upload Your Zipped Code Files")
                 upload_zip_button = gr.UploadButton(label="Select ZIP File", file_types=[".zip"], file_count="single")
-                upload_zip_button.upload(create_graph_from_zip, upload_zip_button, upload_output)
+                upload_zip_button.upload(create_graph_from_zip, [upload_zip_button, graph_build_model], upload_output)
 
             with gr.Group():
                 gr.Markdown("### Import Your Git Project via URL")
@@ -35,7 +69,7 @@ with gr.Blocks(fill_height=True) as demo:
 
                 upload_git_button = gr.Button("Import Git Project")
 
-                upload_git_button.click(create_graph_from_git, [upload_git_input, set_access_token, set_branch], upload_output) 
+                upload_git_button.click(create_graph_from_git, [upload_git_input, graph_build_model, set_access_token, set_branch], upload_output) 
 
         with gr.Tab("Delete data"):
             keyword_input = gr.Textbox(label="Please enter 'Delete' to remove data.")

@@ -26,7 +26,7 @@ class ProgrammingNamedEntities(BaseModel):
         "files, functions, classes, or imports in a single list (name matters only).",
     )
 
-def extract_code_entities(string_with_entities, model='gpt-4o-mini'):
+def extract_code_entities(string_with_entities, model=None):
     """
     Extracts named entities from a given code string, including directories, files,  imports, function names, and class names.
 
@@ -34,7 +34,7 @@ def extract_code_entities(string_with_entities, model='gpt-4o-mini'):
 
     Args:
         string_with_entities (str): Unstructured text as a string from which to extract entities.
-        model (str): The LLM model to use
+        model (str): The LLM model to use. Defaults to 'gpt-4o-mini'. See `llm_client.py`.
         
     Returns:
         entities: An instance of ProgrammingNamedEntities containing the extracted directories, files, imports, functions, and classes.

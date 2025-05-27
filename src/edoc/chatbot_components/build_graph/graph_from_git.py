@@ -54,7 +54,7 @@ def get_project_root_from_github(repo_url, git_token=None, use_branch=None):
     
     return project_dir
 
-def create_graph_from_git(git_url, git_token=None, use_branch=None, progress=gr.Progress(track_tqdm=True)):
+def create_graph_from_git(git_url, model, git_token=None, use_branch=None, progress=gr.Progress(track_tqdm=True)):
     """
     Create a knowledge graph from a GitHub repository.
 
@@ -65,6 +65,7 @@ def create_graph_from_git(git_url, git_token=None, use_branch=None, progress=gr.
         git_url (str): The URL of the GitHub repository.
         git_token (str, optional): GitHub Personal Access Token for private repos.
         use_branch (str): The branch to clone (default is 'main').
+        model (str): The LLM model to use. Defaults from env, see llm_client.py
         progress (gr.Progress, optional): Gradio's progress tracker.
 
     Returns:
@@ -72,7 +73,7 @@ def create_graph_from_git(git_url, git_token=None, use_branch=None, progress=gr.
     """
     root_dir = get_project_root_from_github(git_url, git_token, use_branch)
     if root_dir is not None:
-        codebase_graph = CodebaseGraph(root_directory=root_dir)
+        codebase_graph = CodebaseGraph(root_directory=root_dir, model=model)
         codebase_graph.create_graph()
 
         return "Successfully created graph from Git project."

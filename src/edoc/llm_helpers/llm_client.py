@@ -48,6 +48,7 @@ class LangChainClient(BaseLLM):
         self.llm = ChatOpenAI(
             model_name=self.model_name,
             openai_api_key=self.api_key,
+            temperature=1.0,
             **kwargs
         )
 
@@ -60,20 +61,23 @@ class LangChainAzureClient(BaseLLM):
     def __init__(
         self,
         deployment_name: str = None,
+        endpoint: str = None,
         api_key: str = None,
-        api_base: str = None,
         api_version: str = None,
+        model_name: str = None,
         **kwargs
     ):
         self.deployment_name = deployment_name or os.getenv("AZURE_OPENAI_DEPLOYMENT")
+        self.endpoint = endpoint or os.getenv("AZURE_OPENAI_ENDPOINT")
         self.api_key = api_key or os.getenv("AZURE_OPENAI_KEY")
-        self.api_base = api_base or os.getenv("AZURE_OPENAI_ENDPOINT")
         self.api_version = api_version or os.getenv("AZURE_OPENAI_API_VERSION")
+        self.model_name = model_name or os.getenv("LLM_MODEL", "gpt-4o-mini")
         self.llm = AzureChatOpenAI(
-            deployment_name=self.deployment_name,
+            azure_deployment=self.deployment_name,
             openai_api_key=self.api_key,
-            openai_api_base=self.api_base,
             openai_api_version=self.api_version,
+            model=self.model_name,
+            temperature=1.0,
             **kwargs
         )
 
@@ -85,11 +89,13 @@ class LangChainAzureClient(BaseLLM):
 class AzureClient(BaseLLM):
     def __init__(
         self,
+        deployment_name: str = None,
         endpoint: str = None,
         api_key: str = None,
         api_version: str = None,
         model_name: str = None
     ):
+        self.deployment_name = deployment_name or os.getenv("AZURE_OPENAI_DEPLOYMENT")
         self.endpoint = endpoint or os.getenv("AZURE_OPENAI_ENDPOINT")
         self.api_key = api_key or os.getenv("AZURE_OPENAI_KEY")
         self.api_version = api_version or os.getenv("AZURE_OPENAI_API_VERSION")

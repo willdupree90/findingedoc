@@ -47,7 +47,7 @@ class CodeEntities(BaseModel):
         "and types if available.",
     )
 
-def extract_code_entities(code_string, model='gpt-4o-mini'):
+def extract_code_entities(code_string, model=None):
     """
     Extracts code entities from a given code string, including imports, function names, and class names.
 
@@ -57,7 +57,7 @@ def extract_code_entities(code_string, model='gpt-4o-mini'):
 
     Args:
         code_string (str): The code snippet as a string from which to extract entities.
-        model (str): The LLM model to use
+        model (str): The LLM model to use. Defaults to 'gpt-4o-mini'. See `llm_client.py`.
         
     Returns:
         entities: An instance of CodeEntities containing the extracted imports, functions, and classes.

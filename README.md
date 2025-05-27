@@ -113,7 +113,7 @@ AZURE_OPENAI_API_VERSION=2023-06-01-preview
 # ──────────────────────────────────────────────────────────────────────────────
 # Model names
 # ──────────────────────────────────────────────────────────────────────────────
-LLM_MODEL=gpt-4o-mini             # Chat‐completion model identifier
+LLM_MODEL=gpt-4o-mini             # Base model for Chat‐completion and graph summarization
 EMBEDDING_MODEL=text-embedding-3-small  # Embedding model identifier
 ```
 

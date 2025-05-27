@@ -9,12 +9,12 @@ from langchain_core.runnables import RunnablePassthrough, RunnableParallel
 from langchain_core.output_parsers import StrOutputParser
 
 class BuildResponse:
-    def __init__(self, model='gpt-4o-mini'):
+    def __init__(self, model=None):
         """
         Initialize CodebaseQA class with an LLM model and a Neo4j connection.
 
         Args:
-            llm_model (str): The language model to use. Default is 'gpt-4o-mini'.
+            model (str): The language model to use. Default is 'gpt-4o-mini'. See `llm_client.py`.
 
         """
         llm_client = get_llm_client(

@@ -12,7 +12,7 @@ class FileEnrichmentHandler:
             kg,
             chunk_size=3500,
             chunk_overlap=50,
-            model='gpt-4o-mini'
+            model=None
     ):
         """
         Initialize the CodebaseGraph with a connection to Neo4j.
@@ -21,7 +21,7 @@ class FileEnrichmentHandler:
             kg (Neo4jGraph): graph object to complete cypher queries
             chunk_size (int): size of chunk to use (by number of tokens)
             chunk_overlap (int): number of chunks to overlap when splitting
-            model (str): The OpenAI model to use. Default is 'gpt-4o-mini'.
+            model (str): The OpenAI model to use. Default is 'gpt-4o-mini'. See `llm_client.py`.
         """
         self.kg = kg
         self.chunk_size = chunk_size
