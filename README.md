@@ -36,6 +36,9 @@ Starting the docker service brings up the chatbot, via Gradio.
 
 The Gradio interface will provide several functionalities that allow you to upload graph data, set an API key, ask questions, and delete data from the knowledge graph.
 
+- **Select an LLM Model**
+   For both chat and graph creation you can select available models to interact with. The base model can be set via evironment variables (see [here](#environment-variables)). :warning: To alter the selectable models you must have access to them via API, as well as name them in `src\edoc\chatbot.py`. 
+
 - **Set OpenAI API Key**: 
   If you haven’t already set the `OPENAI_API_KEY` in the `.env` file, the Gradio interface will prompt you to input your OpenAI API key before interacting with the chatbot. The key will only be stored during the session.
   
